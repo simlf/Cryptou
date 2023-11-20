@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./front-cryptou
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8081:8081"
+    environment:
+      MIX_ENV: dev
+      PGDATABASE: ${DATABASE_NAME}
+      PGUSER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - ./front-cryptou:/app
+    depends_on:
+      - postgres-service
+
+  api:
+    build:
+      context: ./back-cryptou
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      MIX_ENV: dev
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOSTNAME: postgres-service
+    volumes:
+        - ./back-cryptou:/app
+    depends_on:
+      - postgres-service
+
+  postgres-service:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080
