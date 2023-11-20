@@ -10,13 +10,13 @@ COPY package*.json ./
 COPY yarn.lock ./
 
 # Install app dependencies
-RUN yarn install
+RUN yarn
 
 # Copy the rest of the app source code to the container
 COPY . .
 
-# Expose the port that the Vue.js app will run on
+# Expose the port that the node.js app will run on
 EXPOSE 3000
 
-# Command to start the Vue.js app in development mode
-CMD [ "npm", "run", "start" ]
+# Command to start the node.js app in development mode
+CMD [ "yarn", "start" ]
