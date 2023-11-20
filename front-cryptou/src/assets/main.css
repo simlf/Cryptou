@@ -68,6 +68,7 @@
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
+    width: 100vw;
   }
   
   @media (prefers-color-scheme: light) {

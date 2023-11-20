@@ -1,30 +1,55 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div id="app">
+    <h1>Crypto Graph</h1>
+    <div id="chartdiv" style="width: 100%; height: 400px;"></div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import axios from 'axios';
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4charts from "@amcharts/amcharts4/charts";
+
+const API_URL = "http://localhost:3000";
+
+async function getCryptoHistory() {
+  const response = await axios.get(`${API_URL}/crypto`);
+  return response.data;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+
+let chart = ref(null);
+
+onMounted(async () => {
+  let data = await getCryptoHistory();
+
+  // Dispose of the chart if it exists
+  if (chart.value) {
+    chart.value.dispose();
+  }
+
+  chart.value = am4core.create("chartdiv", am4charts.XYChart);
+  chart.value.paddingRight = 20;
+
+  let dateAxis = chart.value.xAxes.push(new am4charts.DateAxis());
+  dateAxis.renderer.minGridDistance = 50;
+
+  let valueAxis = chart.value.yAxes.push(new am4charts.ValueAxis());
+  valueAxis.renderer.minGridDistance = 20;
+
+  let series = chart.value.series.push(new am4charts.CandlestickSeries());
+  series.dataFields.dateX = "date";
+  series.dataFields.valueY = "close";
+  series.dataFields.openValueY = "open";
+  series.dataFields.lowValueY = "low";
+  series.dataFields.highValueY = "high";
+
+  series.data = data.map(item => ({
+    date: new Date(item.time * 1000),
+    open: item.open,
+    high: item.high,
+    low: item.low,
+    close: item.close
+  }));
+});
+</script>
