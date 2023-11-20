@@ -1,0 +1,22 @@
+# Use a specific Node.js version
+FROM node:21
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
+COPY yarn.lock ./
+
+# Install app dependencies
+RUN yarn
+
+# Copy the rest of the app source code to the container
+COPY . .
+
+# Expose the port that the node.js app will run on
+EXPOSE 3000
+
+# Command to start the node.js app in development mode
+CMD [ "yarn", "start" ]
