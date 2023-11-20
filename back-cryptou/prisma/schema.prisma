@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String  @id @default(uuid())
+  email           String  @unique
+  password        String
+  defaultCurrency String  @default("EUR")
+  role            Int
+  keywords        String?
+  Role            Role    @relation(fields: [role], references: [id])
+  token           String?
+}
+
+model Cryptocurrency {
+  id                Int    @id @default(autoincrement())
+  fullName          String
+  slugName          String
+  currentPrice      Int
+  openingPrice      Int
+  highestPriceOfDay Int
+  lowestPriceOfDay  Int
+  imageUrl          String
+}
+
+model Article {
+  id       Int              @id @default(autoincrement())
+  title    String
+  summary  String
+  source   String
+  date     DateTime
+  pageUrl  String           @unique
+  imageUrl String?
+  keywords ArticleKeyword[]
+}
+
+model Keyword {
+  id             Int              @id @default(autoincrement())
+  keyword        String
+  ArticleKeyword ArticleKeyword[]
+}
+
+model ArticleKeyword {
+  id        Int     @id @default(autoincrement())
+  keywordId Int
+  articleId Int
+  Keyword   Keyword @relation(fields: [keywordId], references: [id])
+  Article   Article @relation(fields: [articleId], references: [id])
+}
+
+enum RoleName {
+  admin
+  user
+}
+
+model Role {
+  id   Int      @id @default(autoincrement())
+  role RoleName
+  User User[]
+}

@@ -1,16 +1,17 @@
 {
   "dependencies": {
+    "@prisma/client": "^5.6.0",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
-  "scripts" : { 
-    "start" : "nodemon --watch \" *.ts \" --exec \" ts-node \" ./src/server.ts"
-},
+  "scripts": {
+    "start": "nodemon --watch \" *.ts \" --exec \" ts-node \" ./src/server.ts"
+  },
   "name": "cryptou-back",
-  "version": "1",
+  "version": "1.0.0",
   "description": "backend crypto app",
   "main": "index.js",
   "repository": "https://github.com/tistech0/Cryptou/",
@@ -18,6 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.9.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prisma": "^5.6.0"
   }
 }
