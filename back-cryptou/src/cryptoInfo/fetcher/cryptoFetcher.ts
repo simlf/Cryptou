@@ -4,7 +4,7 @@ import { CryptoApiResponse, CryptoGraphData, CryptoChartData } from '../../types
 class CryptoFetcher {
 
   public async callApi(curency: string, limite: number): Promise<CryptoApiResponse> {
-    const apiKey: string = "f86d68f5c626a0398a7d78c66a4555acef091e742e5f00b2fb6d1e8e131755b2";
+    const apiKey: string = "";
     try {
       const response = await axios.get(`https://min-api.cryptocompare.com/data/v2/histohour?fsym=${curency}&tsym=USD&limit=${limite}&api_key=${apiKey}`);
       const rawData = response.data;
