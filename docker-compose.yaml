@@ -14,6 +14,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - ./front-cryptou:/app
+      - /app/node_modules
     depends_on:
       - postgres-service
 
@@ -24,13 +25,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MIX_ENV: dev
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOSTNAME: postgres-service
+     -  DATABASE_URL=postgresql://${DATABASE_NAME}:${DATABASE_PASSWORD}@${DATABASE_HOSTNAME}:5432/${DATABASE_NAME}?schema=public
+     -  MIX_ENV=dev
     volumes:
         - ./back-cryptou:/app
+        - /app/node_modules
     depends_on:
       - postgres-service
 
