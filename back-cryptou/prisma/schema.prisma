@@ -20,10 +20,10 @@ model User {
 }
 
 model Feed {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
-  url         String   @unique
-  lastFetched DateTime @default(now())
+  url         String    @unique
+  lastFetched DateTime?
 }
 
 model Cryptocurrency {

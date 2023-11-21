@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Feed" ALTER COLUMN "lastFetched" DROP NOT NULL,
+ALTER COLUMN "lastFetched" DROP DEFAULT;
