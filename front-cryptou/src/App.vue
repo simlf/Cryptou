@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import LoginPage from "@/view/LoginPage.vue";
+import { RouterView } from 'vue-router'
+
 </script>
 
 <template>
-  <div>
-    <h1>Cryptou</h1>
-    <LoginPage />
-  </div>
+    <router-view />
 </template>
 
-<style scoped></style>
