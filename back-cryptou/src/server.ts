@@ -1,6 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 import userRoutes from "./api/user";
+import cryptoRoutes from "./api/crypto";
 
 const app = express();
 
@@ -10,6 +11,7 @@ const PORT: string | number = process.env.PORT || 3000;
 
 // routes
 app.use(userRoutes);
+app.use(cryptoRoutes);
 
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);
