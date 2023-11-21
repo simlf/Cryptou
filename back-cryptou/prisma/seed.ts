@@ -2,18 +2,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    // Create roles
-    const adminRole = await prisma.role.create({
-        data: { role: 'admin' },
+    // Create or find the 'ADMIN' and 'USER role
+    const adminRole = await prisma.role.upsert({
+        where: { role: 'admin' },
+        update: {},
+        create: { role: 'admin' },
     });
 
-    const userRole = await prisma.role.create({
-        data: { role: 'user' },
+    const userRole = await prisma.role.upsert({
+        where: { role: 'user' },
+        update: {},
+        create: { role: 'user' },
     });
 
-    // Create users
-    await prisma.user.create({
-        data: {
+    // Create users if they don't exist
+    await prisma.user.upsert({
+        where: { email: 'admin@example.com' },
+        update: {},
+        create: {
             email: 'admin@example.com',
             password: 'securepassword',
             defaultCurrency: 'EUR',
@@ -21,8 +27,10 @@ async function main() {
         },
     });
 
-    await prisma.user.create({
-        data: {
+    await prisma.user.upsert({
+        where: { email: 'user@example.com' },
+        update: {},
+        create: {
             email: 'user@example.com',
             password: 'securepassword',
             defaultCurrency: 'EUR',
