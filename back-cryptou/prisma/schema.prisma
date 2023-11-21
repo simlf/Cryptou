@@ -1,6 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "linux-arm64-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,6 +17,13 @@ model User {
   keywords        String?
   Role            Role    @relation(fields: [role], references: [id])
   token           String?
+}
+
+model Feed {
+  id          Int      @id @default(autoincrement())
+  name        String
+  url         String   @unique
+  lastFetched DateTime @default(now())
 }
 
 model Cryptocurrency {
