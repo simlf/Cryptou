@@ -1,9 +1,20 @@
 import { PrismaClient } from '@prisma/client'
 const bodyParser = require("body-parser");
 const express = require("express");
-
+const router = require('express').Router();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerConfig = require('./swaggerConfig.json');
 const app = express();
 const prisma = new PrismaClient()
+
+const specs = swaggerJsdoc(swaggerConfig);
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(specs)
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
