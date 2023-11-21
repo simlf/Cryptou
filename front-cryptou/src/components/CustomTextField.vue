@@ -32,7 +32,7 @@ const updateValue = (event) => {
 
 <style scoped>
 .custom-text-field {
-  width: 300px;
+  width: 350px;
   height: 50px;
   border-radius: 5px;
   border: none;

@@ -20,7 +20,7 @@ defineProps({
 
 <style scoped>
 .custom-button {
-  width: 300px;
+  width: 350px;
   height: 50px;
   border-radius: 10px;
   border: none;
