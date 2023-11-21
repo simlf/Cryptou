@@ -19,6 +19,13 @@ model User {
   token           String?
 }
 
+model Feed {
+  id          Int      @id @default(autoincrement())
+  name        String
+  url         String   @unique
+  lastFetched DateTime @default(now())
+}
+
 model Cryptocurrency {
   id                Int    @id @default(autoincrement())
   fullName          String
