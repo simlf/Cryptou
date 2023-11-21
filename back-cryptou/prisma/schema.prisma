@@ -20,10 +20,11 @@ model User {
 }
 
 model Feed {
-  id          Int       @id @default(autoincrement())
-  name        String
-  url         String    @unique
-  lastFetched DateTime?
+  id              Int       @id @default(autoincrement())
+  name            String
+  url             String    @unique
+  lastFetched     DateTime?
+  lastArticleDate DateTime?
 }
 
 model Cryptocurrency {
@@ -50,7 +51,7 @@ model Article {
 
 model Keyword {
   id             Int              @id @default(autoincrement())
-  keyword        String
+  keyword        String           @unique
   ArticleKeyword ArticleKeyword[]
 }
 
