@@ -4,7 +4,7 @@ const express = require("express");
 const router = require('express').Router();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerConfig = require('./swaggerConfig.json');
+const swaggerConfig = require('../swagger/swaggerConfig.json');
 const app = express();
 const prisma = new PrismaClient()
 
