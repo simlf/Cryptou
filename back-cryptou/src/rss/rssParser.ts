@@ -26,7 +26,6 @@ class RssParser {
     private async storeArticleWithKeywords(feedId: number, item: Parser.Item, keywords: string[]): Promise<void> {
         const articleDate = new Date(item.pubDate || Date.now());
         const imageUrl = this.extractImageUrl(item);
-        console.log(`Aricle ${item.title} - Has this image ${imageUrl}... - ${item}`);
 
         await this.prisma.$transaction(async (prisma) => {
             const existingArticle = await prisma.article.findUnique({
@@ -81,10 +80,6 @@ class RssParser {
     }
 
     private extractImageUrl(item: Parser.Item): string {
-        // if (item['media:content'] && item['media:content'].$.url && item['media:content'].$.type.startsWith('image/')) {
-        //     return item['media:content'].$.url;
-        // }
-
         if (item.enclosure && item.enclosure.url && item.enclosure.type && item.enclosure.type.startsWith('image/')) {
             return item.enclosure.url;
         }
@@ -95,7 +90,6 @@ class RssParser {
         if (imgMatch) {
             return imgMatch[1];
         }
-
         return '';
     }
 }
