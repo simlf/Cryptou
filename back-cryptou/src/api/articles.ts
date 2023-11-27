@@ -35,10 +35,10 @@ const prisma = new PrismaClient();
  *         schema:
  *           type: string
  *         required: false
- *         description: Name of the feed to filter articles
+ *         description: Comma-separated list of feed names to filter articles
  *     responses:
  *       200:
- *         description: A list of articles by descending date order filtered by keywords, date range, and feed name. If no filters are provided, all articles are returned.
+ *         description: A list of articles by descending date order, filtered by keywords, date range, and feed names. Includes only the feed name if available.
  *         content:
  *           application/json:
  *             schema:
@@ -54,6 +54,11 @@ const prisma = new PrismaClient();
  *                     type: string
  *                   imageUrl:
  *                     type: string
+ *                   feed:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
  */
 router.get('/articles', async (req: Request, res: Response) => {
     const { feedName, startDate, endDate } = req.query;
