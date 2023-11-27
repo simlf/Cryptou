@@ -41,6 +41,7 @@ class RssParser {
                         date: articleDate,
                         pageUrl: item.link || '',
                         imageUrl: imageUrl,
+                        feedId: feedId,
                     },
                 });
 
