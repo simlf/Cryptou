@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import swaggerRoutes from './api/swagger';
+import articlesRoutes from './api/articles';
 const bodyParser = require("body-parser");
 const express = require("express");
 const router = require('express').Router();
@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
+app.use(articlesRoutes);
 app.use(swaggerRoutes);
 
 const PORT: string | number = process.env.PORT || 3000;
