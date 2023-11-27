@@ -1,35 +1,28 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `name` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the `Post` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Profile` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "RoleName" AS ENUM ('admin', 'user');
 
--- DropForeignKey
-ALTER TABLE "Post" DROP CONSTRAINT "Post_authorId_fkey";
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "defaultCurrency" TEXT NOT NULL DEFAULT 'EUR',
+    "role" INTEGER NOT NULL,
+    "keywords" TEXT,
+    "token" TEXT,
 
--- DropForeignKey
-ALTER TABLE "Profile" DROP CONSTRAINT "Profile_userId_fkey";
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
--- DropIndex
-DROP INDEX "User_email_key";
+-- CreateTable
+CREATE TABLE "Feed" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "lastFetched" TIMESTAMP(3),
 
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "name",
-ADD COLUMN     "defaultCurrency" TEXT NOT NULL DEFAULT 'EUR',
-ADD COLUMN     "keywords" TEXT,
-ADD COLUMN     "password" TEXT,
-ADD COLUMN     "role" INTEGER NOT NULL DEFAULT 1;
-
--- DropTable
-DROP TABLE "Post";
-
--- DropTable
-DROP TABLE "Profile";
+    CONSTRAINT "Feed_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Cryptocurrency" (
@@ -59,14 +52,6 @@ CREATE TABLE "Article" (
 );
 
 -- CreateTable
-CREATE TABLE "Role" (
-    "id" SERIAL NOT NULL,
-    "role" "RoleName" NOT NULL,
-
-    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Keyword" (
     "id" SERIAL NOT NULL,
     "keyword" TEXT NOT NULL,
@@ -82,6 +67,26 @@ CREATE TABLE "ArticleKeyword" (
 
     CONSTRAINT "ArticleKeyword_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "Role" (
+    "id" SERIAL NOT NULL,
+    "role" "RoleName" NOT NULL,
+
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Feed_url_key" ON "Feed"("url");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Article_pageUrl_key" ON "Article"("pageUrl");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_role_key" ON "Role"("role");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_role_fkey" FOREIGN KEY ("role") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
