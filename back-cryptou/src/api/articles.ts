@@ -66,14 +66,7 @@ router.get('/articles', async (req: Request, res: Response) => {
     let queryConditions: any = {};
 
     if (feedName && typeof feedName === 'string') {
-        queryConditions = {
-            ...queryConditions,
-            feed: {
-                some: {
-                    name: feedName
-                }
-            }
-        };
+        queryConditions.feed = { name: feedName };
     }
 
     if (startDate && typeof startDate === 'string') {
@@ -100,11 +93,8 @@ router.get('/articles', async (req: Request, res: Response) => {
                     }
                 } : {})
             },
-            select: {
-                id: true,
-                title: true,
-                pageUrl: true,
-                imageUrl: true,
+            include: {
+                feed: true,
             },
             orderBy: { date: 'desc' }
         });
