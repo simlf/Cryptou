@@ -20,6 +20,7 @@ CREATE TABLE "Feed" (
     "name" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "lastFetched" TIMESTAMP(3),
+    "lastArticleDate" TIMESTAMP(3),
 
     CONSTRAINT "Feed_pkey" PRIMARY KEY ("id")
 );
@@ -84,6 +85,9 @@ CREATE UNIQUE INDEX "Feed_url_key" ON "Feed"("url");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Article_pageUrl_key" ON "Article"("pageUrl");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Keyword_keyword_key" ON "Keyword"("keyword");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Role_role_key" ON "Role"("role");
