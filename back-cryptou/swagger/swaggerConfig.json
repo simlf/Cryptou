@@ -16,5 +16,5 @@
       }
     ]
   },
-  "apis": ["./routes/*.js"]
+  "apis": ["./src/api/*.ts"]
 }
