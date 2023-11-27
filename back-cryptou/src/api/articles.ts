@@ -130,8 +130,52 @@ router.get('/articles', async (req: Request, res: Response) => {
 });
 
 
-// GET /articles/{id} - Fetch specific article by ID
-router.get('/articles/:id', async (req, res) => {
+/**
+ * @openapi
+ * /articles/{id}:
+ *   get:
+ *     summary: Retrieve a specific article by its ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Unique ID of the article
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Detailed information about the article.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 title:
+ *                   type: string
+ *                 summary:
+ *                   type: string
+ *                 source:
+ *                   type: string
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 pageUrl:
+ *                   type: string
+ *                 imageUrl:
+ *                   type: string
+ *                 feed:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *       404:
+ *         description: Article not found.
+ *       500:
+ *         description: Server error.
+ */
+router.get('/articles/:id', async (req: Request, res: Response) => {
     const articleId = parseInt(req.params.id);
 
     try {
@@ -144,7 +188,12 @@ router.get('/articles/:id', async (req, res) => {
                 source: true,
                 date: true,
                 pageUrl: true,
-                imageUrl: true
+                imageUrl: true,
+                feed: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         });
 
@@ -155,11 +204,10 @@ router.get('/articles/:id', async (req, res) => {
         }
     } catch (error: unknown) {
         if (error instanceof Error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         } else {
-            res.status(500).json({error: 'An unknown error occurred'});
+            res.status(500).json({ error: 'An unknown error occurred' });
         }
     }
 });
-
 export default router;
