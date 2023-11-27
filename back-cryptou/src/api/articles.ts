@@ -61,18 +61,19 @@ const prisma = new PrismaClient();
  *                         type: string
  */
 router.get('/articles', async (req: Request, res: Response) => {
-    const { feedName, startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
     let keywords: string[] = [];
+    let feedNames: string[] = [];
 
     if (typeof req.query.keywords === 'string') {
         keywords = req.query.keywords.split(',').map(k => k.trim());
     }
 
-    let queryConditions: any = {};
-
-    if (feedName && typeof feedName === 'string') {
-        queryConditions.feed = { name: feedName };
+    if (typeof req.query.feedName === 'string') {
+        feedNames = req.query.feedName.split(',').map(fn => fn.trim());
     }
+
+    let queryConditions: any = {};
 
     if (startDate && typeof startDate === 'string') {
         queryConditions.date = { ...(queryConditions.date || {}), gte: new Date(startDate) };
@@ -96,10 +97,25 @@ router.get('/articles', async (req: Request, res: Response) => {
                             }
                         }
                     }
+                } : {}),
+                ...(feedNames.length > 0 ? {
+                    feed: {
+                        name: {
+                            in: feedNames
+                        }
+                    }
                 } : {})
             },
-            include: {
-                feed: true,
+            select: {
+                id: true,
+                title: true,
+                pageUrl: true,
+                imageUrl: true,
+                feed: {
+                    select: {
+                        name: true
+                    }
+                }
             },
             orderBy: { date: 'desc' }
         });
