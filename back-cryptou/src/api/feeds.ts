@@ -30,6 +30,19 @@ router.post('/feeds', async (req: Request, res: Response) => {
     const { name, url } = req.body;
 
     try {
+        const existingFeed = await prisma.feed.findFirst({
+            where: {
+                OR: [
+                    { name },
+                    { url }
+                ],
+            },
+        });
+
+        if (existingFeed) {
+            return res.status(409).json({ error: 'A feed with the same name or URL already exists' });
+        }
+
         const newFeed = await prisma.feed.create({
             data: { name, url },
         });
