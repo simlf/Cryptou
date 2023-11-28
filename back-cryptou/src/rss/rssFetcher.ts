@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
-import RssParser from './RssParser';
+import RssParser from "./rssParser";
 
 class RssFetcher {
     private prisma: PrismaClient;

@@ -25,6 +25,7 @@ model Feed {
   url             String    @unique
   lastFetched     DateTime?
   lastArticleDate DateTime?
+  Article         Article[]
 }
 
 model Cryptocurrency {
@@ -47,6 +48,8 @@ model Article {
   pageUrl  String           @unique
   imageUrl String?
   keywords ArticleKeyword[]
+  feedId   Int
+  feed     Feed             @relation(fields: [feedId], references: [id])
 }
 
 model Keyword {
