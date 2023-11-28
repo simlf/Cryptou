@@ -1,5 +1,6 @@
 import swaggerRoutes from './api/swagger';
 import articlesRoutes from './api/articles';
+import feedsRoutes from './api/feeds';
 const bodyParser = require("body-parser");
 const express = require("express");
 const router = require('express').Router();
@@ -11,6 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.use(articlesRoutes);
+app.use(feedsRoutes);
 app.use(swaggerRoutes);
 
 const PORT: string | number = process.env.PORT || 3000;
