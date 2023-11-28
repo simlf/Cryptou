@@ -77,6 +77,25 @@ async function main() {
         },
     });
 
+
+    // Create feeds
+    await prisma.feed.upsert({
+        where: { url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
+        update: {},
+        create: {
+            url: 'https://www.coindesk.com/arc/outboundfeeds/rss/',
+            name: 'CoinDesk',
+        },
+    });
+
+    await prisma.feed.upsert({
+        where: { url: 'https://cointelegraph.com/rss' },
+        update: {},
+        create: {
+            url: 'https://cointelegraph.com/rss',
+            name: 'CoinTelegraph',
+        },
+    });
 }
 
 main()
