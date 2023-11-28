@@ -1,0 +1,20 @@
+{
+  "definition": {
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Crypto News Feed API",
+      "version": "1.0.0",
+      "description": "This API provides access to cryptocurrency news articles, including functionality to fetch, parse, and store articles from various RSS feeds. It's built using Express and integrates with Prisma for database operations.",
+      "contact": {
+        "name": "GitHub Repository",
+        "url": "https://github.com/tistech0/Cryptou"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ]
+  },
+  "apis": ["./src/api/*.ts"]
+}
