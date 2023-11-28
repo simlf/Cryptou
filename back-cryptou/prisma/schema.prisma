@@ -29,14 +29,10 @@ model Feed {
 }
 
 model Cryptocurrency {
-  id                Int    @id @default(autoincrement())
-  fullName          String
-  slugName          String
-  currentPrice      Int
-  openingPrice      Int
-  highestPriceOfDay Int
-  lowestPriceOfDay  Int
-  imageUrl          String
+  id       Int    @id @default(autoincrement())
+  fullName String @unique
+  slugName String
+  imageUrl String
 }
 
 model Article {
