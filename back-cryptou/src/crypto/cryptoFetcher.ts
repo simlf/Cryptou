@@ -1,33 +1,7 @@
 import axios from 'axios';
-import {CryptoApiResponse, CryptoGraphData, CryptoChartData, CryptoData, CryptoDataSql} from '../types/cryptoInterface';
+import { CryptoChartData, CryptoData, CryptoDataSql} from '../types/cryptoInterface';
 
 export class CryptoFetcher {
-
-    public static async callApi(curency: string, limite: number): Promise<CryptoApiResponse> {
-        const apiKey: string = process.env.CRYPTO_API_KEY || "";
-        try {
-            const response = await axios.get(`https://min-api.cryptocompare.com/data/v2/histohour?fsym=${curency}&tsym=USD&limit=${limite}&api_key=${apiKey}`);
-            const rawData = response.data;
-            const parsedData: CryptoGraphData = {
-                Aggregated: rawData.Data.Aggregated,
-                TimeFrom: rawData.Data.TimeFrom,
-                TimeTo: rawData.Data.TimeTo,
-                Data: rawData.Data.Data as CryptoChartData[],
-            };
-
-            return {
-                Response: rawData.Response,
-                Message: rawData.Message,
-                HasWarning: rawData.HasWarning,
-                Type: rawData.Type,
-                RateLimit: rawData.RateLimit,
-                Data: parsedData,
-            };
-        } catch (error) {
-            console.error(`Error fetching crypto data: ${error}`);
-            throw error;
-        }
-    }
 
     public static async getCryptoGenralInfo(crypto: CryptoDataSql, currency: string): Promise<CryptoData> {
         const apiKey: string = process.env.CRYPTO_API_KEY || "";
