@@ -1,13 +1,34 @@
-import Parser from 'rss-parser';
+import Parser, {Item} from 'rss-parser';
 import { PrismaClient } from '@prisma/client';
 import keywordExtractor from 'keyword-extractor';
 
+interface MediaContent {
+    $: {
+        url: string;
+        type?: string;
+        height?: string;
+        width?: string;
+    };
+}
+
+interface ExtendedItem extends Item {
+    mediaContent?: MediaContent;
+    mediaThumbnail?: MediaContent;
+}
+
 class RssParser {
-    private parser: Parser;
+    private parser: Parser<ExtendedItem>;
     private prisma: PrismaClient;
 
     constructor() {
-        this.parser = new Parser();
+        this.parser = new Parser({
+            customFields: {
+                item: [
+                    ['media:content', 'mediaContent'],
+                    ['media:thumbnail', 'mediaThumbnail']
+                ]
+            }
+        });
         this.prisma = new PrismaClient();
     }
 
@@ -80,14 +101,23 @@ class RssParser {
         });
     }
 
-    private extractImageUrl(item: Parser.Item): string {
-        if (item.enclosure && item.enclosure.url && item.enclosure.type && item.enclosure.type.startsWith('image/')) {
+    private extractImageUrl(item: ExtendedItem): string {
+        if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
+            return item.mediaContent.$.url;
+        }
+
+        if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
+            return item.mediaThumbnail.$.url;
+        }
+
+        if (item.enclosure && item.enclosure?.type?.startsWith('image/') && item.enclosure.url) {
             return item.enclosure.url;
         }
 
-        const descriptionContent = item.content || item.contentSnippet || '';
+        // Check for images embedded in description/content
+        const content = item.content || item.contentSnippet || '';
         const imgRegex = /<img.*?src=["'](.*?)["']/;
-        const imgMatch = descriptionContent.match(imgRegex);
+        const imgMatch = content.match(imgRegex);
         if (imgMatch) {
             return imgMatch[1];
         }

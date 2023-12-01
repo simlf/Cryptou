@@ -1,5 +1,6 @@
 import swaggerRoutes from './api/swagger';
 import articlesRoutes from './api/articles';
+import feedsRoutes from './api/feeds';
 const bodyParser = require("body-parser");
 const express = require("express");
 const router = require('express').Router();
@@ -20,6 +21,7 @@ const PORT: string | number = process.env.PORT || 3000;
 //app.use(userRoutes);
 app.use(cryptoRoutes);
 app.use(articlesRoutes);
+app.use(feedsRoutes);
 app.use(swaggerRoutes);
 
 app.listen(PORT, () => {
