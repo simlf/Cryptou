@@ -1,5 +1,6 @@
 import swaggerRoutes from './api/swagger';
 import articlesRoutes from './api/articles';
+import userRoutes from "./api/user";
 import feedsRoutes from './api/feeds';
 const bodyParser = require("body-parser");
 const express = require("express");
@@ -29,7 +30,7 @@ app.listen(PORT, () => {
 });
 
 async function startApplication() {
-  console.log('Starting application...')
+  console.log("Starting application...");
   const rssFetcher = new RssFetcher();
   await rssFetcher.fetchAllFeeds();
   console.log('Fetch finished application...')

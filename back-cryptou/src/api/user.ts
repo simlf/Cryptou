@@ -1,4 +1,4 @@
-const express = require("express");
+// const express = require("express");
 import prisma from "../lib/prisma";
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -7,10 +7,11 @@ const router = express.Router();
 
 // get users (protected by authentication)
 router.get("/users", authenticateToken, async (req: Request, res: Response) => {
+  // router.get("/users", async (req: Request, res: Response, next: any) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
-  } catch (e) {
+  } catch (e: any) {
     console.error("error:", e);
     res.status(500);
     res.json({ e: "error:" });
@@ -18,12 +19,21 @@ router.get("/users", authenticateToken, async (req: Request, res: Response) => {
 });
 
 // create new user
-
 router.post("/users", async (req: Request, res: Response) => {
   try {
     const { email, password, defaultCurrency, role, keywords, token } =
       req.body;
-
+    // create new user
+    // router.post("/users", async (req: Request, res: Response) => {
+    //   try {
+    //     const {
+    //       email,
+    //       password,
+    //       defaultCurrency,
+    //       role,
+    //       keywords,
+    //       // token = generateToken(email),
+    //     } = req.body;
     const newUser = await prisma.user.create({
       data: {
         email,
@@ -31,7 +41,8 @@ router.post("/users", async (req: Request, res: Response) => {
         defaultCurrency,
         role,
         keywords,
-        token: generateToken(email),
+        token,
+        // token: generateToken(email),
       },
     });
 
@@ -47,13 +58,13 @@ router.post("/users", async (req: Request, res: Response) => {
 });
 
 // Fonction pour générer un token JWT
-function generateToken(email: string): string {
-  const secret = process.env.JWT_SECRET || "your-secret-key";
-  console.log("Secret utilisé pour signer le token :", secret);
+// function generateToken(email: string): string {
+//   const secret = process.env.JWT_SECRET || "your-secret-key";
+//   console.log("Secret utilisé pour signer le token :", secret);
 
-  const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
-  console.log("Token généré avec succès :", token);
-  return token;
-}
+//   const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
+//   console.log("Token généré avec succès :", token);
+//   return token;
+// }
 
 export default router;
