@@ -1,5 +1,6 @@
 import swaggerRoutes from './api/swagger';
 import articlesRoutes from './api/articles';
+import userRoutes from "./api/user";
 import feedsRoutes from './api/feeds';
 import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
