@@ -1,70 +1,100 @@
-// const express = require("express");
 import prisma from "../lib/prisma";
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { authenticateToken } from "../middlewares/auth";
+const bcrypt = require("bcrypt");
+// import { authenticateToken } from "../middlewares/auth";
 const router = express.Router();
 
-// get users (protected by authentication)
-router.get("/users", authenticateToken, async (req: Request, res: Response) => {
-  // router.get("/users", async (req: Request, res: Response, next: any) => {
+/**
+ * @openapi
+ * /users:
+ *   get:
+ *     summary: get users [protected by authentication]
+ */
+
+// router.get("/users", authenticateToken, async (req: Request, res: Response) => {
+router.get("/users", async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("error:", e);
     res.status(500);
     res.json({ e: "error:" });
   }
 });
 
-// create new user
-router.post("/users", async (req: Request, res: Response) => {
+/**
+ * @openapi
+ * /users:
+ *   post:
+ *     summary: create new user
+ */
+router.post("/register", async (req: Request, res: Response) => {
   try {
     const { email, password, defaultCurrency, role, keywords, token } =
       req.body;
-    // create new user
-    // router.post("/users", async (req: Request, res: Response) => {
-    //   try {
-    //     const {
-    //       email,
-    //       password,
-    //       defaultCurrency,
-    //       role,
-    //       keywords,
-    //       // token = generateToken(email),
-    //     } = req.body;
+    const saltRounds = 3;
+    const salt = await bcrypt.genSalt(saltRounds);
+    // Hach password
+    const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await prisma.user.create({
       data: {
         email,
-        password,
+        password: hashedPassword,
         defaultCurrency,
         role,
         keywords,
-        token,
-        // token: generateToken(email),
+        token: generateToken(email),
       },
     });
 
-    console.log("👏 :", newUser);
     res.json(newUser);
+    res.send("User registered successfully! ");
   } catch (e: any) {
-    console.error("❌ :", e);
+    console.error("error :", e);
     res.status(500).json({
-      error: "❌",
+      error: "error",
       details: e.message,
     });
   }
 });
 
-// Fonction pour générer un token JWT
-// function generateToken(email: string): string {
-//   const secret = process.env.JWT_SECRET || "your-secret-key";
-//   console.log("Secret utilisé pour signer le token :", secret);
+// Function to generate JWT token
+function generateToken(email: string): string {
+  const secret = process.env.JWT_SECRET || "your-secret-key";
+  console.log("Secret utilisé pour signer le token :", secret);
 
-//   const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
-//   console.log("Token généré avec succès :", token);
-//   return token;
-// }
+  const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
+  console.log("Token généré avec succès :", token);
+  return token;
+}
+
+/**
+ * @openapi
+ * /login:
+ *   post:
+ *     summary: connect user
+ */
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) {
+    return res.status(401).send("Email or password incorrect");
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    return res.status(401).send("Email or password incorrect");
+  }
+
+  res.send("Connexion réussie!");
+});
 
 export default router;
