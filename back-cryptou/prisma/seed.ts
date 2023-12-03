@@ -44,7 +44,7 @@ async function main() {
         update: {},
         create: {
             fullName: 'Bitcoin',
-            slugName: 'btc',
+            slugName: 'BTC',
             imageUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
         },
     });
@@ -54,7 +54,7 @@ async function main() {
         update: {},
         create: {
             fullName: 'Ethereum',
-            slugName: 'eth',
+            slugName: 'ETH',
             imageUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
         },
     });
@@ -63,7 +63,7 @@ async function main() {
         update: {},
         create: {
             fullName: 'Doge coin',
-            slugName: 'doge',
+            slugName: 'DOGE',
             imageUrl: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png?1547792256',
         },
     });
@@ -72,7 +72,7 @@ async function main() {
         update: {},
         create: {
             fullName: 'Stable coin',
-            slugName: 'usdt',
+            slugName: 'USDT',
             imageUrl: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
         },
     });
