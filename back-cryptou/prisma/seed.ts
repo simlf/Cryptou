@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// import { PrismaClient } from '@prisma/client';
+// const prisma = new PrismaClient();
+import prisma from "../src/lib/prisma";
 
 async function main() {
     // Create or find the 'ADMIN' and 'USER role
