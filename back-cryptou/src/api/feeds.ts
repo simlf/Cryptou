@@ -110,6 +110,8 @@ router.post('/feeds', async (req: Request, res: Response) => {
  * @openapi
  * /feeds:
  *   get:
+ *     tags:
+ *       - Feeds
  *     summary: Get all feeds
  *     responses:
  *       200:
@@ -147,6 +149,8 @@ router.get('/feeds', async (req: Request, res: Response) => {
  * @openapi
  * /feeds/{id}:
  *   put:
+ *     tags:
+ *       - Feeds
  *     summary: Update a feed
  *     parameters:
  *       - in: path
@@ -195,6 +199,8 @@ router.put('/feeds/:id', async (req: Request, res: Response) => {
  * @openapi
  * /feeds/{id}:
  *   delete:
+ *     tags:
+ *       - Feeds
  *     summary: Delete a feed
  *     parameters:
  *       - in: path

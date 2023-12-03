@@ -10,9 +10,18 @@
         "url": "https://github.com/tistech0/Cryptou"
       }
     },
-    "servers": [
+    "tags": [
       {
-        "url": "http://localhost:3000"
+        "name": "Articles",
+        "description": "Operation related to Articles."
+      },
+      {
+        "name": "Feeds",
+        "description": "Endpoints for fetching, parsing, and storing RSS feeds."
+      },
+      {
+        "name": "Cryptocurrencies",
+        "description": "Endpoints for fetching, parsing, and storing cryptocurrency data."
       }
     ]
   },
