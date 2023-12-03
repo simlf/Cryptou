@@ -32,16 +32,38 @@ class RssParser {
         this.prisma = new PrismaClient();
     }
 
-    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date): Promise<void> {
-        const feed = await this.parser.parseString(feedContent);
+    public async canParseFeed(feedContent: string): Promise<boolean> {
+        try {
+            const feed = await this.parser.parseString(feedContent);
 
-        for (const item of feed.items) {
-            const articleDate = new Date(item.pubDate || Date.now());
-            if (!lastArticleDate || articleDate > lastArticleDate) {
-                const keywords = this.extractKeywords(item.contentSnippet || item.content || '');
-                await this.storeArticleWithKeywords(feedId, item, keywords);
+            // Check if the feed has at least one item and validate its structure
+            if (feed.items && feed.items.length > 0) {
+                const firstItem = feed.items[0];
+                if (firstItem.title && firstItem.link) {
+                    return true;
+                }
             }
+            return false;
+        } catch (err) {
+            console.error('canParseFeed():', err);
+            return false;
         }
+    }
+
+    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date): Promise<void> {
+        await this.parser.parseString(feedContent, async (err, feed) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            for (const item of feed.items) {
+                const articleDate = new Date(item.pubDate || Date.now());
+                if (!lastArticleDate || articleDate > lastArticleDate) {
+                    const keywords = this.extractKeywords(item.contentSnippet || item.content || '');
+                    await this.storeArticleWithKeywords(feedId, item, keywords);
+                }
+            }
+        })
     }
 
     private async storeArticleWithKeywords(feedId: number, item: Parser.Item, keywords: string[]): Promise<void> {

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
 import RssParser from "./rssParser";
 
-class RssFetcher {
+class FeedFetcher {
     private prisma: PrismaClient;
     private parser: RssParser;
 
@@ -38,10 +38,13 @@ class RssFetcher {
         }
     }
 
-    private async fetchFeed(url: string): Promise<string> {
-        const response = await axios.get(url);
-        return response.data;
+    public async fetchFeed(url: string): Promise<string> {
+        try {
+            return (await axios.get(url)).data;
+        } catch (error) {
+            throw error instanceof Error ? error : new Error('An unknown error occurred while fetching the feed');
+        }
     }
 }
 
-export default RssFetcher;
+export default FeedFetcher;
