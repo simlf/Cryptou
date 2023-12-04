@@ -141,7 +141,6 @@ router.get('/articles', async (req: Request, res: Response) => {
             select: {
                 id: true,
                 title: true,
-                // summary: true,
                 pageUrl: true,
                 imageUrl: true,
                 feed: {

@@ -73,13 +73,11 @@ onMounted(fetchArticles);
     </v-row>
     <v-row justify="center">
       <v-btn v-if="pagination.currentPage > 1"
-             @click="changePage(pagination.currentPage - 1)"
-             color="#48A9A6" class="my-4">
+             @click="changePage(pagination.currentPage - 1)" class="my-4">
         Prev
       </v-btn>
       <v-btn v-if="pagination.currentPage * pagination.pageSize < pagination.totalArticles"
-             @click="changePage(pagination.currentPage + 1)"
-             color="#48A9A6" class="my-4">
+             @click="changePage(pagination.currentPage + 1)" class="my-4">
         Next
       </v-btn>
     </v-row>
