@@ -10,11 +10,13 @@ interface MediaContent {
         height?: string;
         width?: string;
     };
+    encoded?: string;
 }
 
 interface ExtendedItem extends Item {
     mediaContent?: MediaContent;
     mediaThumbnail?: MediaContent;
+    contentEncoded?: string;
 }
 
 class RssParser {
@@ -26,7 +28,8 @@ class RssParser {
             customFields: {
                 item: [
                     ['media:content', 'mediaContent'],
-                    ['media:thumbnail', 'mediaThumbnail']
+                    ['media:thumbnail', 'mediaThumbnail'],
+                    ['content:encoded', 'contentEncoded']
                 ]
             }
         });
@@ -139,11 +142,24 @@ class RssParser {
             return item.enclosure.url;
         }
 
-        // Check for images embedded in description/content
-        const content = item.content || item.contentSnippet || '';
+        // Check for images embedded in content:encoded, content, or contentSnippet
+        let content: string = '';
+
+        // If content:encoded is a string, use it directly
+        if (typeof item.contentEncoded === 'string') {
+            content = item.contentEncoded;
+        } else if (item.content && typeof item.content === 'string') {
+            // If 'content' is a string, use it
+            content = item.content;
+        } else if (item.contentSnippet && typeof item.contentSnippet === 'string') {
+            // If 'contentSnippet' is a string, use it
+            content = item.contentSnippet;
+        }
+
+        // Use a regex to extract the image URL from the content
         const imgRegex = /<img.*?src=["'](.*?)["']/;
         const imgMatch = content.match(imgRegex);
-        if (imgMatch) {
+        if (imgMatch && imgMatch[1]) {
             return imgMatch[1];
         }
         return '';
