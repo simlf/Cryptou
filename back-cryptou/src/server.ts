@@ -1,6 +1,7 @@
 import swaggerRoutes from './api/swagger';
 import articlesRoutes from './api/articles';
 import feedsRoutes from './api/feeds';
+import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
 const express = require("express");
 const cors = require("cors");
@@ -9,6 +10,7 @@ import FeedFetcher from "./rss/feedFetcher";
 //import userRoutes from "./api/user";
 import cryptoRoutes from "./api/crypto";
 import { PrismaClient } from '@prisma/client';
+import keywords from "./api/keywords";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -29,6 +31,7 @@ app.use(cors());
 app.use(cryptoRoutes);
 app.use(articlesRoutes);
 app.use(feedsRoutes);
+app.use(keywordsRoutes);
 app.use(swaggerRoutes);
 
 app.listen(PORT, () => {
