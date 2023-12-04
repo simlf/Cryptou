@@ -47,7 +47,7 @@ const prisma = new PrismaClient();
  *         name: pageSize
  *         schema:
  *           type: integer
- *           default: 10
+ *           default: 9
  *         required: false
  *         description: The number of articles to retrieve per page
  *     responses:
