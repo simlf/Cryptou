@@ -85,6 +85,7 @@ async function main() {
         create: {
             url: 'https://www.coindesk.com/arc/outboundfeeds/rss/',
             name: 'CoinDesk',
+            languageName: 'english',
         },
     });
 
@@ -94,6 +95,17 @@ async function main() {
         create: {
             url: 'https://cointelegraph.com/rss',
             name: 'CoinTelegraph',
+            languageName: 'english',
+        },
+    });
+
+    await prisma.feed.upsert({
+        where: { url: 'https://the-blog.fr/feed/' },
+        update: {},
+        create: {
+            url: 'https://the-blog.fr/feed/',
+            name: 'The Blog FR',
+            languageName: 'french',
         },
     });
 }

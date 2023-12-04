@@ -22,6 +22,7 @@ const prisma = new PrismaClient();
  *             required:
  *               - name
  *               - url
+ *               - languageName
  *             properties:
  *               name:
  *                 type: string
@@ -29,6 +30,9 @@ const prisma = new PrismaClient();
  *               url:
  *                 type: string
  *                 description: URL of the feed.
+ *               language:
+ *                 type: string
+ *                 description: Name of the language of the feed.
  *     responses:
  *       201:
  *         description: Feed created successfully.
@@ -73,7 +77,8 @@ const prisma = new PrismaClient();
  *                   type: string
  */
 router.post('/feeds', async (req: Request, res: Response) => {
-    const { name, url } = req.body;
+    const { name, url, language } = req.body;
+    const languageName = language.toLowerCase();
 
     try {
         const existingFeed = await prisma.feed.findFirst({
@@ -94,7 +99,7 @@ router.post('/feeds', async (req: Request, res: Response) => {
         }
 
         const newFeed = await prisma.feed.create({
-            data: { name, url },
+            data: { name, url, languageName },
         });
         res.status(201).json(newFeed);
     } catch (error: unknown) {
@@ -170,6 +175,8 @@ router.get('/feeds', async (req: Request, res: Response) => {
  *                 type: string
  *               url:
  *                 type: string
+ *               language:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Feed updated successfully
@@ -178,12 +185,13 @@ router.get('/feeds', async (req: Request, res: Response) => {
  */
 router.put('/feeds/:id', async (req: Request, res: Response) => {
     const feedId = parseInt(req.params.id);
-    const { name, url } = req.body;
+    const { name, url, language } = req.body;
+    const languageName = language.toLowerCase();
 
     try {
         const updatedFeed = await prisma.feed.update({
             where: { id: feedId },
-            data: { name, url },
+            data: { name, url, languageName },
         });
         res.json(updatedFeed);
     } catch (error: unknown) {

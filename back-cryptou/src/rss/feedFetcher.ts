@@ -16,7 +16,7 @@ class FeedFetcher {
 
         const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
         const feeds = await this.prisma.feed.findMany({
-            select: { id: true, url: true, lastFetched: true, lastArticleDate: true }
+            select: { id: true, url: true, lastFetched: true, lastArticleDate: true, languageName: true }
         });
 
         for (const feed of feeds) {
@@ -26,7 +26,7 @@ class FeedFetcher {
                 // Handle the potential null value for lastArticleDate
                 const lastArticleDate = feed.lastArticleDate ? new Date(feed.lastArticleDate) : new Date(0);
 
-                await this.parser.parseAndStore(feed.id, feedContent, lastArticleDate);
+                await this.parser.parseAndStore(feed.id, feedContent, lastArticleDate, feed.languageName);
 
                 await this.prisma.feed.update({
                     where: { id: feed.id },

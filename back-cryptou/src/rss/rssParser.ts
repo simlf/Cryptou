@@ -1,6 +1,7 @@
 import Parser, {Item} from 'rss-parser';
 import { PrismaClient } from '@prisma/client';
 import keywordExtractor from 'keyword-extractor';
+import { LanguageName } from "keyword-extractor/types/lib/keyword_extractor";
 
 interface MediaContent {
     $: {
@@ -50,7 +51,7 @@ class RssParser {
         }
     }
 
-    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date): Promise<void> {
+    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date, languageName: string): Promise<void> {
         await this.parser.parseString(feedContent, async (err, feed) => {
             if (err) {
                 console.error(err);
@@ -59,7 +60,7 @@ class RssParser {
             for (const item of feed.items) {
                 const articleDate = new Date(item.pubDate || Date.now());
                 if (!lastArticleDate || articleDate > lastArticleDate) {
-                    const keywords = this.extractKeywords(item.contentSnippet || item.content || '');
+                    const keywords = this.extractKeywords(item.contentSnippet || item.content || '', languageName);
                     await this.storeArticleWithKeywords(feedId, item, keywords);
                 }
             }
@@ -114,9 +115,11 @@ class RssParser {
         });
     }
 
-    private extractKeywords(content: string): string[] {
+    private extractKeywords(content: string, languageName: string): string[] {
+        const language = languageName as LanguageName;
+
         return keywordExtractor.extract(content, {
-            language: "english",
+            language: language,
             remove_digits: true,
             return_changed_case: true,
             remove_duplicates: true
