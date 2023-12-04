@@ -8,7 +8,9 @@ const prisma = new PrismaClient();
  * @openapi
  * /articles:
  *   get:
- *     summary: Retrieve a list of articles with pagination
+ *     tags:
+ *       - Articles
+ *     summary: Retrieve a list of articles
  *     parameters:
  *       - in: query
  *         name: keywords
@@ -193,6 +195,8 @@ router.get('/articles', async (req: Request, res: Response) => {
  * @openapi
  * /articles/{id}:
  *   get:
+ *     tags:
+ *       - Articles
  *     summary: Retrieve a specific article by its ID
  *     parameters:
  *       - in: path
