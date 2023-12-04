@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
  * @openapi
  * /articles:
  *   get:
- *     summary: Retrieve a list of articles
+ *     summary: Retrieve a list of articles with pagination
  *     parameters:
  *       - in: query
  *         name: keywords
@@ -36,32 +36,62 @@ const prisma = new PrismaClient();
  *           type: string
  *         required: false
  *         description: Comma-separated list of feed names to filter articles
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         required: false
+ *         description: The page number of the articles to retrieve
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: The number of articles to retrieve per page
  *     responses:
  *       200:
- *         description: A list of articles by descending date order, filtered by keywords, date range, and feed names. Includes only the feed name if available.
+ *         description: A paginated list of articles by descending date order, filtered by keywords, date range, and feed names. Includes only the feed name if available, along with pagination details.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   title:
- *                     type: string
- *                   pageUrl:
- *                     type: string
- *                   imageUrl:
- *                     type: string
- *                   feed:
+ *               type: object
+ *               required:
+ *                 - articles
+ *                 - totalArticles
+ *               properties:
+ *                 totalArticles:
+ *                   type: integer
+ *                   description: The total number of articles available.
+ *                 articles:
+ *                   type: array
+ *                   items:
  *                     type: object
  *                     properties:
- *                       name:
+ *                       id:
+ *                         type: integer
+ *                       title:
  *                         type: string
+ *                       summary:
+ *                         type: string
+ *                       pageUrl:
+ *                         type: string
+ *                       imageUrl:
+ *                         type: string
+ *                       feed:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
  */
 router.get('/articles', async (req: Request, res: Response) => {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, page = '1', pageSize = '9' } = req.query;
+
+    const pageNumber = parseInt(String(page), 10);
+    const size = parseInt(String(pageSize), 10);
+    const offset = (pageNumber - 1) * size;
+
     let keywords: string[] = [];
     let feedNames: string[] = [];
 
@@ -109,6 +139,7 @@ router.get('/articles', async (req: Request, res: Response) => {
             select: {
                 id: true,
                 title: true,
+                // summary: true,
                 pageUrl: true,
                 imageUrl: true,
                 feed: {
@@ -117,9 +148,37 @@ router.get('/articles', async (req: Request, res: Response) => {
                     }
                 }
             },
-            orderBy: { date: 'desc' }
+            orderBy: { date: 'desc' },
+            take: size,
+            skip: offset
         });
-        res.json(articles);
+
+        // Counting the total articles
+        const totalArticles = await prisma.article.count({
+            where: {
+                ...queryConditions,
+                ...(keywords.length > 0 ? {
+                    keywords: {
+                        some: {
+                            Keyword: {
+                                keyword: {
+                                    in: keywords
+                                }
+                            }
+                        }
+                    }
+                } : {}),
+                ...(feedNames.length > 0 ? {
+                    feed: {
+                        name: {
+                            in: feedNames
+                        }
+                    }
+                } : {})
+            },
+        });
+
+        res.json({ articles, totalArticles });
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).json({ error: error.message });
