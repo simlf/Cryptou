@@ -43,6 +43,18 @@ const changePage = (page: number) => {
   fetchArticles();
 };
 
+const handleFeedsUpdate = (feeds) => {
+  // Logic to handle updated feeds
+  console.log('Updated feeds:', feeds);
+  // Example: fetchArticles({ feeds });
+};
+
+const handleKeywordsUpdate = (keywords) => {
+  // Logic to handle updated keywords
+  console.log('Updated keywords:', keywords);
+  // Example: fetchArticles({ keywords });
+};
+
 onMounted(fetchArticles);
 </script>
 
@@ -57,7 +69,10 @@ onMounted(fetchArticles);
       <v-alert v-if="errorState" type="error" dismissible>
         {{ errorMessage }}
       </v-alert>
-      <FilterArticles />
+      <FilterArticles
+          @update-feeds="handleFeedsUpdate"
+          @update-keywords="handleKeywordsUpdate"
+      />
       <v-col v-for="article in articles" :key="article.id" cols="12" sm="6" md="4">
         <a :href="article.pageUrl" target="_blank" class="text-decoration-none no-underline hover:no-underline">
           <div class="my-3">
