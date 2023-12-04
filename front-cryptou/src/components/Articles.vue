@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import axios from 'axios';
+import FilterArticles from "./FilterArticles.vue";
 
 interface Article {
   id: string;
@@ -56,6 +57,7 @@ onMounted(fetchArticles);
       <v-alert v-if="errorState" type="error" dismissible>
         {{ errorMessage }}
       </v-alert>
+      <FilterArticles />
       <v-col v-for="article in articles" :key="article.id" cols="12" sm="6" md="4">
         <a :href="article.pageUrl" target="_blank" class="text-decoration-none no-underline hover:no-underline">
           <div class="my-3">
