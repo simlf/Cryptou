@@ -4,7 +4,7 @@ import feedsRoutes from './api/feeds';
 const bodyParser = require("body-parser");
 const express = require("express");
 const router = require('express').Router();
-import RssFetcher from "./rss/rssFetcher";
+import FeedFetcher from "./rss/feedFetcher";
 //import userRoutes from "./api/user";
 import cryptoRoutes from "./api/crypto";
 import { PrismaClient } from '@prisma/client';
@@ -30,8 +30,8 @@ app.listen(PORT, () => {
 
 async function startApplication() {
   console.log('Starting application...')
-  const rssFetcher = new RssFetcher();
-  await rssFetcher.fetchAllFeeds();
+  const feedFetcher = new FeedFetcher();
+  await feedFetcher.fetchAllFeeds();
   console.log('Fetch finished application...')
 }
 
