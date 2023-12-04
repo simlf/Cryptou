@@ -61,7 +61,9 @@ onMounted(fetchArticles);
       <v-col v-for="article in articles" :key="article.id" cols="12" sm="6" md="4">
         <a :href="article.pageUrl" target="_blank" class="text-decoration-none no-underline hover:no-underline">
           <div class="my-3">
-            <v-img :src="article.imageUrl" height="300px" alt="Article image"></v-img>
+            <v-img v-if="article.imageUrl" :src="article.imageUrl" height="300px" alt="Article image"></v-img>
+            <!-- TODO: Replace with a placeholder image -->
+            <v-img v-else src="https://placehold.co/600x400.png" height="300px" alt="Article image placeholder"></v-img>
             <div class="px-2">
               <div class="text-h6 my-2 text-black hover:text-black" style="line-height: 1.5;">{{ article.title }}</div>
             </div>
