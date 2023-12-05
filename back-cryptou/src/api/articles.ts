@@ -178,7 +178,6 @@ router.get('/articles', async (req: Request, res: Response) => {
                 } : {})
             },
         });
-
         res.json({ articles, totalArticles });
     } catch (error: unknown) {
         if (error instanceof Error) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue';
+import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
-import FilterArticles from "./FilterArticles.vue";
+import CustomSelectorMulti from "./CustomSelectorMulti.vue";
 
 interface Article {
   id: string;
@@ -29,12 +29,25 @@ const errorMessage = ref('');
 
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/articles?page=${pagination.currentPage}&limit=${pagination.pageSize}`);
+    let url = `http://localhost:3000/articles?page=${pagination.currentPage}&pageSize=${pagination.pageSize}`;
+
+    if (selectedKeywords.value.length > 0) {
+      const keywordsParam = selectedKeywords;
+      url += `&keywords=${encodeURIComponent(keywordsParam.value)}`;
+    }
+
+    if (selectedFeeds.value.length > 0) {
+      const feedsParam = selectedFeeds;
+      url += `&feedName=${encodeURIComponent(feedsParam.value)}`;
+    }
+
+    const response = await axios.get(url);
     articles.value = response.data.articles;
     pagination.totalArticles = response.data.totalArticles;
   } catch (error) {
     errorState.value = true;
-    errorMessage.value = 'Failed to load articles. Please try again later.';  }
+    errorMessage.value = 'Failed to load articles. Please try again later.';
+  }
 };
 
 const changePage = (page: number) => {
@@ -43,19 +56,49 @@ const changePage = (page: number) => {
   fetchArticles();
 };
 
-const handleFeedsUpdate = (feeds) => {
-  // Logic to handle updated feeds
-  console.log('Updated feeds:', feeds);
-  // Example: fetchArticles({ feeds });
-};
+interface Keywords {
+  keyword: string;
+}
 
-const handleKeywordsUpdate = (keywords) => {
-  // Logic to handle updated keywords
-  console.log('Updated keywords:', keywords);
-  // Example: fetchArticles({ keywords });
-};
+interface Feeds {
+  name: string;
+}
 
-onMounted(fetchArticles);
+type TransformFunction<T, U> = (item: T) => U;
+
+async function fetchData<T, U>(url: string, transform: TransformFunction<T, U>): Promise<U[]> {
+  try {
+    const response = await axios.get<T[]>(url);
+    return response.data.map(transform);
+  } catch (error) {
+    errorState.value = true;
+    errorMessage.value = `Failed to load data from ${url}. Please try again later.`;
+    return [];
+  }
+}
+
+const selectedKeywords = ref<string[]>([]);
+const selectedFeeds = ref<string[]>([]);
+
+const feeds = ref<string[]>([]);
+const keywords = ref<string[]>([]);
+
+watch([selectedKeywords, selectedFeeds], () => {
+  fetchArticles();
+})
+
+onMounted(async () => {
+  keywords.value = await fetchData<Keywords, string>(
+      'http://localhost:3000/keywords',
+      (kw) => kw.keyword
+  );
+
+  feeds.value = await fetchData<Feeds, string>(
+      'http://localhost:3000/feeds',
+      (fd) => fd.name
+  );
+  fetchArticles();
+});
 </script>
 
 <template>
@@ -65,14 +108,28 @@ onMounted(fetchArticles);
         <h2 class="text-h4 text-center mb-4">Highlighting Crypto Updates</h2>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row justify="start">
       <v-alert v-if="errorState" type="error" dismissible>
         {{ errorMessage }}
       </v-alert>
-      <FilterArticles
-          @update-feeds="handleFeedsUpdate"
-          @update-keywords="handleKeywordsUpdate"
-      />
+      <v-col cols="12" md="6">
+        <CustomSelectorMulti
+            v-model="selectedKeywords"
+            :arrayChoices="keywords"
+            placeholder="Select keyword(s)"
+            colorBackground="#48A9A6"
+        />
+      </v-col>
+    </v-row>
+      <v-col cols="12" md="6">
+        <CustomSelectorMulti
+            v-model="selectedFeeds"
+            :arrayChoices="feeds"
+            placeholder="Select feed(s)"
+            colorBackground="#48A9A6"
+        />
+      </v-col>
+      <v-row>
       <v-col v-for="article in articles" :key="article.id" cols="12" sm="6" md="4">
         <a :href="article.pageUrl" target="_blank" class="text-decoration-none no-underline hover:no-underline">
           <div class="my-3">
