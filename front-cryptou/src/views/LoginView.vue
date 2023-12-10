@@ -4,29 +4,52 @@
     <h1 class="title">Welcome back !</h1>
   </div>
   <div class="form-wrapper">
-    <custom-button message="Sign in with google" colorBackground="var(--primary-dark-green)" @onClick="console.log('sign in with google')"/>
-    <hr>
-    <custom-text-field placeholder="Email" colorBackground="var(--primary-light-green)" v-model="email" class="field"/>
-    <custom-text-field placeholder="Password" colorBackground="var(--primary-light-green)" v-model="password" class="field"/>
-    <custom-button message="sign in" colorBackground="var(--primary-dark-green)" @onClick="console.log('sign in')"/>
-    <p class="register-link">No account ? <a @click="this.$router.push('/register')" style="text-decoration: underline">Create it !</a></p>
+    <custom-button
+      message="Sign in with google"
+      colorBackground="var(--primary-dark-green)"
+      @onClick="console.log('sign in with google')"
+    />
+    <hr />
+    <custom-text-field
+      placeholder="Email"
+      colorBackground="var(--primary-light-green)"
+      v-model="email"
+      class="field"
+    />
+    <custom-text-field
+      placeholder="Password"
+      colorBackground="var(--primary-light-green)"
+      v-model="password"
+      class="field"
+    />
+    <custom-button
+      message="sign in"
+      colorBackground="var(--primary-dark-green)"
+      @onClick="console.log('sign in')"
+    />
+    <p class="register-link">
+      No account ?
+      <a
+        @click="this.$router.push('/register')"
+        style="text-decoration: underline"
+        >Create it !</a
+      >
+    </p>
   </div>
-  <wave-footer v-if="mobile"/>
+  <wave-footer v-if="mobile" />
 </template>
 
 <script setup lang="ts">
-import CustomButton from '../components/CustomButton.vue'
-import CustomTextField from '../components/CustomTextField.vue'
-import WaveFooter from '../components/WaveFooter.vue'
-import { ref } from 'vue';
-import { useDisplay } from 'vuetify'
+import CustomButton from "../components/CustomButton.vue";
+import CustomTextField from "../components/CustomTextField.vue";
+import WaveFooter from "../components/WaveFooter.vue";
+import { ref } from "vue";
+import { useDisplay } from "vuetify";
 
-const { mobile } = useDisplay()
+const { mobile } = useDisplay();
 
-
-let email = ref('')
-let password = ref('')
-
+let email = ref("");
+let password = ref("");
 </script>
 
 <style scoped>
@@ -49,7 +72,7 @@ let password = ref('')
   font-size: 2.5rem;
   font-weight: 300;
   margin-top: 1rem;
-  color: var(--primary-dark-green)
+  color: var(--primary-dark-green);
 }
 
 .form-wrapper {
@@ -59,10 +82,9 @@ let password = ref('')
   justify-content: center;
   column-gap: 10px;
   height: 100%;
-  z-index: 1; /* Add this line */
-  position: relative; /* Add this line */
+  z-index: 1;
+  position: relative;
 }
-
 
 hr {
   width: 240px;
@@ -82,5 +104,4 @@ hr {
   margin-top: 10px;
   width: 300px;
 }
-
 </style>
