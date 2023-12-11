@@ -80,7 +80,7 @@ hr {
   font-size: 12px;
   text-align: left;
   margin-top: 10px;
-  width: 300px;
+  width: 350px;
 }
 
 </style>
