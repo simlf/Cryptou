@@ -19,7 +19,6 @@ const prisma = new PrismaClient();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 
 const PORT: string | number = process.env.PORT || 3000;
 
@@ -37,6 +36,7 @@ app.use(feedsRoutes);
 app.use(keywordsRoutes);
 app.use(swaggerRoutes);
 
+app.options('*', cors());
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
 });
