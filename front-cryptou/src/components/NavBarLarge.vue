@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import CustomButton from "@components/CustomButton.vue";
+import {useDisplay} from "vuetify";
+
+const {mobile} = useDisplay();
 </script>
 
 <template>
     <div class="top-bar">
       <v-col class="logo-wrapper">
         <img src="../assets/logo.svg" alt="Logo" class="logo" />
-        <p>Illuminate Your Crypto Journey with<br><strong>Cryptou</strong></p>
+        <p :class="{'topline': mobile}">Illuminate Your Crypto Journey with<br><strong>Cryptou</strong></p>
       </v-col>
       <v-col class="top-bar-right-section">
-        <router-link to="/articles">
+        <router-link to="/articles" v-show="!mobile">
             <span class="top-nav-link">Articles</span>
         </router-link>
-        <router-link to="/">
+        <router-link to="/" v-show="!mobile">
           <span class="top-nav-border-left top-nav-link" style="padding: 16px 10px">Crypto</span>
         </router-link>
         <router-link to="/login">
-          <div class="top-nav-border-left top-nav-link">
-            <custom-button color-background="var(--primary-dark-green)" message="Connexion"/>
+          <div :class="{'top-nav-border-left': !mobile, 'top-nav-link': true}">
+          <custom-button color-background="var(--primary-dark-green)" message="Login"/>
           </div>
         </router-link>
       </v-col>
@@ -31,6 +34,11 @@ import CustomButton from "@components/CustomButton.vue";
   display: flex;
   width: 100%;
   height: 80px;
+}
+
+.topline {
+  font-size: 0.8em;
+  width: 150px;
 }
 
 .top-nav-border-left {
