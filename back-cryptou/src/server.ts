@@ -1,12 +1,17 @@
-import swaggerRoutes from './api/swagger';
-import articlesRoutes from './api/articles';
+import swaggerRoutes from "./api/swagger";
+import articlesRoutes from "./api/articles";
+import userRoutes from "./api/user";
 import feedsRoutes from './api/feeds';
+import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
 const express = require("express");
 import RssFetcher from "./rss/rssFetcher";
-//import userRoutes from "./api/user";
 import cors from 'cors';
+const router = require('express').Router();
+import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
+import { PrismaClient } from '@prisma/client';
+import keywords from "./api/keywords";
 
 import { PrismaClient } from '@prisma/client';
 const app = express();
@@ -18,11 +23,18 @@ app.use(cors());
 
 const PORT: string | number = process.env.PORT || 3000;
 
+// Enable All CORS Requests for development purposes
+app.use(cors());
+
+// For production, specify the origin instead of '*'
+// app.use(cors({ origin: 'https://yourfrontenddomain.com' }));
+
 // routes
-//app.use(userRoutes);
 app.use(cryptoRoutes);
 app.use(articlesRoutes);
+app.use(userRoutes);
 app.use(feedsRoutes);
+app.use(keywordsRoutes);
 app.use(swaggerRoutes);
 
 app.options('*', cors());
@@ -31,14 +43,13 @@ app.listen(PORT, () => {
 });
 
 async function startApplication() {
-    console.log('Starting application...')
-    const rssFetcher = new RssFetcher();
-    await rssFetcher.fetchAllFeeds();
-    console.log('Fetch finished application...')
+  console.log('Starting application...')
+  const feedFetcher = new FeedFetcher();
+  await feedFetcher.fetchAllFeeds();
+  console.log('Fetch finished application...')
 }
 
 startApplication().catch(console.error);
-
-app.on('close', () => {
-    prisma.$disconnect();
+app.on("close", () => {
+  prisma.$disconnect();
 });
