@@ -32,6 +32,7 @@
   "author": "Epitech Teams",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.9.0",
     "@types/swagger-jsdoc": "^6.0.4",
