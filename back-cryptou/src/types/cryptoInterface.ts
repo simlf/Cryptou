@@ -36,6 +36,7 @@ export interface CryptoDataSql {
 }
 
 export interface CryptoData {
+    id: number;
     cryptoName: string;
     currentPrice: number;
     openingPrice: number;
