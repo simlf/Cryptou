@@ -3,7 +3,7 @@
     <div class="loader"></div>
   </div>
   <div class="crypto-wrapper" v-else>
-    <img :src="crypto.imageUrl" class="crypto-image">
+    <img :src="crypto.imageUrl" alt="crypto logo" class="crypto-image">
     <div class="crypto-info">
       <p style="font-weight: bold">{{crypto.cryptoName}}</p>
       <p>{{crypto.currentPrice}}
