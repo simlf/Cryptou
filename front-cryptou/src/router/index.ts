@@ -3,12 +3,14 @@ import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import GraphView from "../views/GraphView.vue";
 import Articles from "../components/Articles.vue";
+import HomeView from "../views/HomeView.vue";
 
 export const routeNames = {
     login: "login",
     register: "register",
     graph: "graph",
     articles: "articles",
+    home: "home",
 };
 
 const router = createRouter({
@@ -16,6 +18,11 @@ const router = createRouter({
     routes: [
         {
             path: "/",
+            name: routeNames.home,
+            component: HomeView,
+        },
+        {
+            path: "/login",
             name: routeNames.login,
             component: LoginView,
         },
