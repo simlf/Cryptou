@@ -22,6 +22,10 @@
       {
         "name": "Cryptocurrencies",
         "description": "Endpoints for fetching, parsing, and storing cryptocurrency data."
+      },
+      {
+        "name": "Keywords",
+        "description": "Endpoints for fetching keywords."
       }
     ]
   },
