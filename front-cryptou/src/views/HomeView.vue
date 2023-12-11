@@ -1,5 +1,5 @@
 <template>
-  <div class="market-wrapper" v-if="loading">
+  <div class="market-wrapper" v-if="loadingMarket">
     <div class="loader"></div>
   </div>
   <div class="market-wrapper" :class="{'mobile': mobile, 'desktop': !mobile}" v-else>
@@ -10,32 +10,68 @@
     </div>
   </div>
   <hr class="separator">
-
+  <h1 class="title-section">Highlighting Crypto Updates</h1>
+  <div class="article-wrapper" v-if="loadingArticle">
+    <div class="loader"></div>
+  </div>
+  <div v-else>
+    <div v-if="mobile" class="article-wrapper">
+      <v-carousel cycle height="450" hide-delimiters progress="primary" prev-icon="mdi-arrow-left" next-icon="mdi-arrow-right">
+        <v-carousel-item
+            v-for="(article, i) in lastArticle"
+            :key="i"
+        >
+          <Articles :article="article" />
+        </v-carousel-item>
+      </v-carousel>
+      <custom-button color-background="var(--primary-dark-green)" message="See all"/>
+    </div>
+    <div class="article-wrapper" v-else>
+      <div class="article-item"
+           v-for="article in lastArticle"
+           :key="article.id">
+        <Articles :article="article" />
+      </div>
+      <custom-button color-background="var(--primary-dark-green)" message="See all"/>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import CryptoMarket from "@components/CryptoMarket.vue";
+import Articles from "@/components/ArticleComponent.vue";
+import CustomButton from "@components/CustomButton.vue";
+import axios from "axios";
 import { useCryptoStore } from "../store/cryptosStore.ts";
 import {onMounted, ref} from "vue";
 import { useDisplay } from "vuetify";
 
+import { Article } from "../types/ArticleInterface.ts";
+
 const { mobile } = useDisplay();
 
-if (mobile) {
-  console.log('mobile');
-} else {
-  console.log('desktop');
-}
-
 const cryptoStore = useCryptoStore();
-let loading = ref(true);
+let loadingMarket = ref(true);
+let loadingArticle = ref(true);
 let cryptocurrencyNames: any = [];
+let lastArticle: Article[] = [];
+
+async function fetchLastArticle(): Promise<Article[]> {
+  let response;
+  if (mobile)
+    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
+  else
+    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
+  return response.data.articles
+}
 
 onMounted(async () => {
   if (cryptoStore.cryptocurrencyNames.length === 0)
     await cryptoStore.fetchCryptos();
   cryptocurrencyNames = cryptoStore.cryptocurrencyNames;
-  loading.value = false;
+  loadingMarket.value = false;
+  lastArticle = await fetchLastArticle();
+  loadingArticle.value = false;
 });
 </script>
 
@@ -64,6 +100,28 @@ onMounted(async () => {
 
 .desktop {
   justify-content: space-around;
+}
+
+.title-section {
+  text-align: left;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.article-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100vw;
+  padding: 10px;
+}
+
+.article-item {
+  flex: 1 0 30%;
+  max-width: 30%;
+  margin: 1%;
 }
 
 .loader {
