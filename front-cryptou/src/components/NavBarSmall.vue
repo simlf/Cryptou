@@ -5,7 +5,7 @@ import HomeIcon from "./Icons/HomeIcon.vue";
 </script>
 <template>
   <v-layout>
-    <v-bottom-navigation active color="primary">
+    <v-bottom-navigation class="bg-white" active color="primary">
       <v-btn>
         <HomeIcon />
       </v-btn>
