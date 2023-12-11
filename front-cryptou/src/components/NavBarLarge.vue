@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import CryptoIcon from "./Icons/CryptoIcon.vue";
-import FeedIcon from "./Icons/FeedIcon.vue";
-import HomeIcon from "./Icons/HomeIcon.vue";
-import CustomSmallButton from "../components/CustomSmallButton.vue";
 import CustomButton from "@components/CustomButton.vue";
-const connexion = () => {
-  console.log("se connecter");
-};
 </script>
 
 <template>
@@ -22,7 +15,7 @@ const connexion = () => {
         <router-link to="/">
           <span class="top-nav-border-left top-nav-link" style="padding: 16px 10px">Crypto</span>
         </router-link>
-        <router-link to="/">
+        <router-link to="/login">
           <div class="top-nav-border-left top-nav-link">
             <custom-button color-background="var(--primary-dark-green)" message="Connexion"/>
           </div>
@@ -83,39 +76,4 @@ span:hover {
   text-decoration: none;
 }
 
-.item-center {
-  display: flex;
-  align-items: center;
-}
 </style>
-
-<!--
-<v-row align="center" justify="space-between">
-&lt;!&ndash; logo &ndash;&gt;
-<v-col class="left-section">
-  <img src="../assets/logo.svg" alt="Logo" class="logo" />
-</v-col>
-&lt;!&ndash; links &ndash;&gt;
-<v-col align="center">
-  <router-link to="/">
-    <home-icon />
-    <span>Home</span>
-  </router-link>
-  <router-link to="/">
-    <feed-icon />
-    <span>Feeds</span>
-  </router-link>
-  <router-link to="/">
-    <crypto-icon />
-    <span>Crypto</span>
-  </router-link>
-</v-col>
-
-<v-col align="right">
-  <custom-small-button
-      message="Connexion"
-      colorBackground="var(&#45;&#45;primary-dark-green)"
-      @onClick="connexion"
-  />
-</v-col>
-</v-row>-->
