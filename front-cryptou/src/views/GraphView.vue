@@ -1,7 +1,7 @@
 <template>
-  <crypto-graph  crypto-id="1"/>
+  <crypto-market crypto-id="1"/>
 </template>
 
 <script setup lang="ts">
-import CryptoGraph from '../components/CryptoGraph.vue'
+import CryptoMarket from "@components/CryptoMarket.vue";
 </script>
