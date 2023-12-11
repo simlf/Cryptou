@@ -5,15 +5,11 @@ import feedsRoutes from './api/feeds';
 import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
 const express = require("express");
-import RssFetcher from "./rss/rssFetcher";
 import cors from 'cors';
-const router = require('express').Router();
 import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
 import { PrismaClient } from '@prisma/client';
-import keywords from "./api/keywords";
 
-import { PrismaClient } from '@prisma/client';
 const app = express();
 const prisma = new PrismaClient();
 
