@@ -9,7 +9,7 @@ import CustomButton from "@components/CustomButton.vue";
         <p>Illuminate Your Crypto Journey with<br><strong>Cryptou</strong></p>
       </v-col>
       <v-col class="top-bar-right-section">
-        <router-link to="/">
+        <router-link to="/articles">
             <span class="top-nav-link">Articles</span>
         </router-link>
         <router-link to="/">
