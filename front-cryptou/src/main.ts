@@ -9,6 +9,10 @@ import { createVuetify } from "vuetify";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+// VuePic
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 
 const app = createApp(App);
 
@@ -56,5 +60,7 @@ const vuetify = createVuetify({
 
 app.use(router);
 app.use(vuetify);
+
+app.component('VueDatePicker', VueDatePicker);
 
 app.mount("#app");
