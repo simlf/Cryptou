@@ -7,7 +7,7 @@
     <div class="crypto-info">
       <p style="font-weight: bold">{{crypto.cryptoName}}</p>
       <p>{{crypto.currentPrice}}
-        <sup v-if="crypto.change >= 0" style="color: green;">{{crypto.change}} %</sup>
+        <sup v-if="crypto.change >= 0" style="color: green;">+{{crypto.change}} %</sup>
         <sup v-else style="color: red;">{{crypto.change}} %</sup>
       </p>
       <p>{{crypto.volume}} <sup>Vol / 24h</sup></p>
