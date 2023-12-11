@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
-import CustomSelectorMulti from "./CustomSelectorMulti.vue";
+import CustomSelectorMulti from "@components/CustomSelectorMulti.vue";
 
 const dateRange = ref();
 
