@@ -5,14 +5,9 @@ import feedsRoutes from './api/feeds';
 import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
 const express = require("express");
-import RssFetcher from "./rss/rssFetcher";
 import cors from 'cors';
-const router = require('express').Router();
 import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
-import { PrismaClient } from '@prisma/client';
-import keywords from "./api/keywords";
-
 import { PrismaClient } from '@prisma/client';
 const app = express();
 const prisma = new PrismaClient();
@@ -24,7 +19,6 @@ const PORT: string | number = process.env.PORT || 3000;
 
 // Enable All CORS Requests for development purposes
 app.use(cors());
-
 // For production, specify the origin instead of '*'
 // app.use(cors({ origin: 'https://yourfrontenddomain.com' }));
 
