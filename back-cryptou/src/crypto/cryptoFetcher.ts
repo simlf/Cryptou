@@ -93,4 +93,27 @@ export class CryptoFetcher {
             }
         }
     }
+
+    public static async getCryptoGraphData (slugName: string, currency: string, max: number, min: number, unit: string): Promise<CryptoChartData[]> {
+        const apiKey: string = process.env.CRYPTO_API_KEY || "";
+        const cryptoListPrice: CryptoChartData[] = [];
+
+        const response = await axios.get(`https://min-api.cryptocompare.com/data/v2/histo${unit}?fsym=${slugName}&tsym=${currency}&toTs=${max}&fromTs=${min}&api_key=${apiKey}`);
+        const rawData: CryptoChartData[] = response.data.Data.Data;
+
+        rawData.forEach((element: CryptoChartData) => {
+            cryptoListPrice.push({
+                time: element.time,
+                high: element.high,
+                low: element.low,
+                open: element.open,
+                volumefrom: element.volumefrom,
+                volumeto: element.volumeto,
+                close: element.close,
+                conversionType: element.conversionType,
+                conversionSymbol: element.conversionSymbol,
+            });
+        });
+        return cryptoListPrice;
+    }
 }

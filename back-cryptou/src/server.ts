@@ -1,17 +1,19 @@
-import swaggerRoutes from './api/swagger';
-import articlesRoutes from './api/articles';
+import swaggerRoutes from "./api/swagger";
+import articlesRoutes from "./api/articles";
+import userRoutes from "./api/user";
 import feedsRoutes from './api/feeds';
 import keywordsRoutes from './api/keywords';
 const bodyParser = require("body-parser");
 const express = require("express");
-const cors = require("cors");
+import RssFetcher from "./rss/rssFetcher";
+import cors from 'cors';
 const router = require('express').Router();
 import FeedFetcher from "./rss/feedFetcher";
-//import userRoutes from "./api/user";
 import cryptoRoutes from "./api/crypto";
 import { PrismaClient } from '@prisma/client';
 import keywords from "./api/keywords";
 
+import { PrismaClient } from '@prisma/client';
 const app = express();
 const prisma = new PrismaClient();
 
@@ -27,15 +29,16 @@ app.use(cors());
 // app.use(cors({ origin: 'https://yourfrontenddomain.com' }));
 
 // routes
-//app.use(userRoutes);
 app.use(cryptoRoutes);
 app.use(articlesRoutes);
+app.use(userRoutes);
 app.use(feedsRoutes);
 app.use(keywordsRoutes);
 app.use(swaggerRoutes);
 
+app.options('*', cors());
 app.listen(PORT, () => {
-  console.log(`server is running on ${PORT}`);
+    console.log(`server is running on ${PORT}`);
 });
 
 async function startApplication() {
@@ -46,7 +49,6 @@ async function startApplication() {
 }
 
 startApplication().catch(console.error);
-
-app.on('close', () => {
+app.on("close", () => {
   prisma.$disconnect();
 });

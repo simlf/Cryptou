@@ -24,17 +24,11 @@ defineProps({
 <style scoped>
 .custom-button {
   width: auto;
-  padding: 8px 15px;
+  padding: 5px 10px;
   border-radius: 10px;
   border: none;
   color: white;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  /* cursor: pointer; */
-  transition: all 0.3s ease-in-out;
-}
-
-.custom-button:hover {
-  transform: scale(1.05);
 }
 </style>

@@ -226,6 +226,74 @@ router.get("/cryptos/:cmid/history/:period", async (req: Request, res: Response)
 });
 
 /**
+ * @swagger
+ * /cryptos/graph:
+ *   get:
+ *     summary: Retrieve a cryptocurrency graph data
+ *     description: Retrieve cryptocurrency graph data based on the provided query parameters.
+ *     parameters:
+ *       - in: query
+ *         name: cmid
+ *         schema:
+ *           type: integer
+ *         description: The id of the cryptocurrency
+ *       - in: query
+ *         name: unit
+ *         schema:
+ *           type: string
+ *         description: The time unit for the graph data
+ *       - in: query
+ *         name: min
+ *         schema:
+ *           type: integer
+ *         description: The minimum time for the graph data
+ *       - in: query
+ *         name: max
+ *         schema:
+ *           type: integer
+ *         description: The maximum time for the graph data
+ *     responses:
+ *       200:
+ *         description: A list of cryptocurrency graph data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CryptoData'
+ *       404:
+ *         description: Cryptocurrency not found
+ *       500:
+ *         description: Something went wrong
+ */
+router.get("/cryptos/graph/:cmid/:unit/:min/:max", async (req: Request, res: Response): Promise<void> => {
+    const cryptoId: number = parseInt(req.params.cmid);
+    const unit: string = req.params.unit;
+    const max: number = parseInt(req.params.max);
+    const min: number = parseInt(req.params.min);
+
+    if (!['day', 'hour', 'minute'].includes(unit)) {
+        res.status(400).json({ error: "Invalid unit. It can only be 'day', 'hour', or 'minute'." });
+        return;
+    }
+
+    try {
+        const crypto: CryptoDataSql | null = await prisma.cryptocurrency.findUnique({
+          where: { id: cryptoId },
+        });
+
+        if (crypto !== null) {
+          const cryptoInfo: CryptoChartData[] = await CryptoFetcher.getCryptoGraphData(crypto.slugName, "EUR", max, min, unit);
+          res.status(200).json(cryptoInfo);
+        } else {
+          res.status(404).json({ error: "Cryptocurrency not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Something went wrong" });
+    }
+});
+
+/**
  * @openapi
  * /cryptos/{cmid}:
  *   delete:
