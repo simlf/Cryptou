@@ -15,7 +15,7 @@ const {mobile} = useDisplay();
         <router-link to="/articles" v-show="!mobile">
             <span class="top-nav-link">Articles</span>
         </router-link>
-        <router-link to="/" v-show="!mobile">
+        <router-link to="/graph" v-show="!mobile">
           <span class="top-nav-border-left top-nav-link" style="padding: 16px 10px">Crypto</span>
         </router-link>
         <router-link to="/login">

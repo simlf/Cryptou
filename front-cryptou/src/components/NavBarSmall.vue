@@ -5,16 +5,26 @@ import HomeIcon from "./Icons/HomeIcon.vue";
 </script>
 <template>
   <v-layout>
-    <v-bottom-navigation class="bg-white" active color="primary">
-      <v-btn>
+    <v-bottom-navigation class="bg-white" color="secondary" v-model="activeButton">
+      <v-btn value="home" to="/">
         <HomeIcon />
       </v-btn>
-      <v-btn>
+      <v-btn value="articles" to="/articles">
         <FeedIcon />
       </v-btn>
-      <v-btn>
+      <v-btn value="graph" to="/graph">
         <CryptoIcon />
       </v-btn>
     </v-bottom-navigation>
   </v-layout>
 </template>
+
+<script lang="ts">
+export default {
+  data() {
+    return {
+      activeButton: 'home', // This will make the "Home" button active by default
+    };
+  },
+};
+</script>
