@@ -9,7 +9,7 @@ const connexion = () => {
 </script>
 <template>
   <v-layout>
-    <v-app-bar>
+    <v-app-bar class="bg-white">
       <v-container>
         <v-row align="center" justify="space-between">
           <!-- logo -->
