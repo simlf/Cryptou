@@ -29,6 +29,7 @@ const router = createRouter({
             name: routeNames.graph,
             component: GraphView,
         },
+        {
             path: "/articles",
             name: routeNames.articles,
             component: Articles,
