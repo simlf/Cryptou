@@ -20,7 +20,6 @@ const PORT: string | number = process.env.PORT || 3000;
 
 // Enable All CORS Requests for development purposes
 app.use(cors());
-
 // For production, specify the origin instead of '*'
 // app.use(cors({ origin: 'https://yourfrontenddomain.com' }));
 

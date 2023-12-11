@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^7.4.0",
     "@amcharts/amcharts5": "^5.6.2",
     "@amcharts/amcharts5-fonts": "^5.0.1",
     "@amcharts/amcharts5-geodata": "^5.1.1",

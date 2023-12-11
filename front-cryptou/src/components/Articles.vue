@@ -3,6 +3,13 @@ import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
 import CustomSelectorMulti from "./CustomSelectorMulti.vue";
 
+const dateRange = ref();
+
+const disableFutureDates = (date) => {
+  const today = new Date();
+  return date >= today;
+};
+
 interface Article {
   id: string;
   title: string;
@@ -26,29 +33,6 @@ const pagination = reactive<Pagination>({
 
 const errorState = ref(false);
 const errorMessage = ref('');
-
-const fetchArticles = async () => {
-  try {
-    let url = `http://localhost:3000/articles?page=${pagination.currentPage}&pageSize=${pagination.pageSize}`;
-
-    if (selectedKeywords.value.length > 0) {
-      const keywordsParam = selectedKeywords;
-      url += `&keywords=${encodeURIComponent(keywordsParam.value)}`;
-    }
-
-    if (selectedFeeds.value.length > 0) {
-      const feedsParam = selectedFeeds;
-      url += `&feedName=${encodeURIComponent(feedsParam.value)}`;
-    }
-
-    const response = await axios.get(url);
-    articles.value = response.data.articles;
-    pagination.totalArticles = response.data.totalArticles;
-  } catch (error) {
-    errorState.value = true;
-    errorMessage.value = 'Failed to load articles. Please try again later.';
-  }
-};
 
 const changePage = (page: number) => {
   console.log(`Changing to page ${page}`);
@@ -83,7 +67,36 @@ const selectedFeeds = ref<string[]>([]);
 const feeds = ref<string[]>([]);
 const keywords = ref<string[]>([]);
 
-watch([selectedKeywords, selectedFeeds], () => {
+const fetchArticles = async () => {
+  try {
+    let url = `http://localhost:3000/articles?page=${pagination.currentPage}&pageSize=${pagination.pageSize}`;
+
+    if (selectedKeywords.value.length > 0) {
+      const keywordsParam = selectedKeywords;
+      url += `&keywords=${encodeURIComponent(keywordsParam.value)}`;
+    }
+
+    if (selectedFeeds.value.length > 0) {
+      const feedsParam = selectedFeeds;
+      url += `&feedName=${encodeURIComponent(feedsParam.value)}`;
+    }
+
+    if (dateRange.value) {
+      const [startDate, endDate] = dateRange.value;
+      url += `&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    }
+
+    const response = await axios.get(url);
+    articles.value = response.data.articles;
+    pagination.totalArticles = response.data.totalArticles;
+  } catch (error) {
+    errorState.value = true;
+    errorMessage.value = 'Failed to load articles. Please try again later.';
+  }
+};
+
+
+watch([selectedKeywords, selectedFeeds, dateRange], () => {
   fetchArticles();
 })
 
@@ -108,11 +121,11 @@ onMounted(async () => {
         <h2 class="text-h4 text-center mb-4">Highlighting Crypto Updates</h2>
       </v-col>
     </v-row>
-    <v-row justify="start">
+    <v-row align="center">
       <v-alert v-if="errorState" type="error" dismissible>
         {{ errorMessage }}
       </v-alert>
-      <v-col cols="12" md="6">
+      <v-col cols="6" md="4">
         <CustomSelectorMulti
             v-model="selectedKeywords"
             :arrayChoices="keywords"
@@ -120,8 +133,7 @@ onMounted(async () => {
             colorBackground="#48A9A6"
         />
       </v-col>
-    </v-row>
-      <v-col cols="12" md="6">
+      <v-col cols="6" md="4">
         <CustomSelectorMulti
             v-model="selectedFeeds"
             :arrayChoices="feeds"
@@ -129,6 +141,11 @@ onMounted(async () => {
             colorBackground="#48A9A6"
         />
       </v-col>
+      <v-col cols="2" md="2">
+        <VueDatePicker v-model="dateRange" range :enable-time-picker="false" :disabled-dates="disableFutureDates"></VueDatePicker>
+      </v-col>
+    </v-row>
+
       <v-row>
       <v-col v-for="article in articles" :key="article.id" cols="12" sm="6" md="4">
         <a :href="article.pageUrl" target="_blank" class="text-decoration-none no-underline hover:no-underline">
