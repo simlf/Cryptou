@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
+import GraphView from "../views/GraphView.vue";
 
 export const routeNames = {
     login: "login",
     register: "register",
+    graph: "graph",
 };
 
 const router = createRouter({
@@ -20,6 +22,11 @@ const router = createRouter({
             name: routeNames.register,
             component: RegisterView,
         },
+        {
+            path: "/graph",
+            name: routeNames.graph,
+            component: GraphView,
+        }
     ],
 });
 
