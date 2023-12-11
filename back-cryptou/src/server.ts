@@ -37,7 +37,6 @@ app.use(feedsRoutes);
 app.use(keywordsRoutes);
 app.use(swaggerRoutes);
 
-app.options('*', cors());
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
 });
