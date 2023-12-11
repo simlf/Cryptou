@@ -11,10 +11,12 @@ export class CryptoFetcher {
             const rawData = response.data;
             const parsedData: CryptoData = {
                 cryptoName: crypto.fullName,
-                currentPrice: rawData.DISPLAY[cryptoSlug][currency].PRICE,
-                openingPrice: rawData.DISPLAY[cryptoSlug][currency].OPENDAY,
-                lowestPrice: rawData.DISPLAY[cryptoSlug][currency].LOWDAY,
-                highestPrice: rawData.DISPLAY[cryptoSlug][currency].HIGHDAY,
+                currentPrice: rawData.DISPLAY[cryptoSlug][currency].PRICE.substring(2).replace(/,/g, "."),
+                openingPrice: rawData.DISPLAY[cryptoSlug][currency].OPENDAY.substring(2).replace(/,/g, "."),
+                lowestPrice: rawData.DISPLAY[cryptoSlug][currency].LOWDAY.substring(2).replace(/,/g, "."),
+                highestPrice: rawData.DISPLAY[cryptoSlug][currency].HIGHDAY.substring(2).replace(/,/g, "."),
+                volume: rawData.DISPLAY[cryptoSlug][currency].VOLUME24HOUR.substring(2).replace(/,/g, "."),
+                change: rawData.DISPLAY[cryptoSlug][currency].CHANGEPCT24HOUR,
                 imageUrl: crypto.imageUrl,
             };
 

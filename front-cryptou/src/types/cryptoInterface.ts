@@ -37,5 +37,7 @@ export interface CryptoData {
     openingPrice: number;
     lowestPrice: number;
     highestPrice: number;
+    volume: number;
+    change: number;
     imageUrl: string;
 }
