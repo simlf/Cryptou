@@ -8,7 +8,7 @@ const express = require("express");
 import cors from 'cors';
 import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
