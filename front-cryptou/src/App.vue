@@ -10,9 +10,7 @@ const { mobile } = useDisplay();
 <template>
   <div>
     <NavBarSmall v-if="mobile" />
-    <NavBarLarge v-else />
-    <div class="mt-16 w-80vw mx-auto">
-      <router-view />
-    </div>
+    <NavBarLarge/>
+    <router-view />
   </div>
 </template>

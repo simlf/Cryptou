@@ -26,11 +26,11 @@ const vuetify = createVuetify({
           myCustomTheme: {
               colors: {
                   green: '#48A9A6',
-                  background: '#ccc',
+                  background: '#B6DDDB',
                   surface: '#48A9A6',
-                  primary: '#00ff00',
+                  primary: '#B6DDDB',
                   'primary-darken-1': '#3700B3',
-                  secondary: '#03DAC5',
+                  secondary: '#48A9A6',
                   'secondary-darken-1': '#03DAC5',
                   error: '#CF6679',
                   info: '#2196F3',

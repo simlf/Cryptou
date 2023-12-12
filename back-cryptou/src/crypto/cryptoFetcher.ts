@@ -10,12 +10,13 @@ export class CryptoFetcher {
             const response = await axios.get(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${cryptoSlug}&tsyms=${currency}&api_key=${apiKey}`);
             const rawData = response.data;
             const parsedData: CryptoData = {
+                id: crypto.id,
                 cryptoName: crypto.fullName,
-                currentPrice: rawData.DISPLAY[cryptoSlug][currency].PRICE.substring(2).replace(/,/g, "."),
-                openingPrice: rawData.DISPLAY[cryptoSlug][currency].OPENDAY.substring(2).replace(/,/g, "."),
-                lowestPrice: rawData.DISPLAY[cryptoSlug][currency].LOWDAY.substring(2).replace(/,/g, "."),
-                highestPrice: rawData.DISPLAY[cryptoSlug][currency].HIGHDAY.substring(2).replace(/,/g, "."),
-                volume: rawData.DISPLAY[cryptoSlug][currency].VOLUME24HOUR.substring(2).replace(/,/g, "."),
+                currentPrice: rawData.DISPLAY[cryptoSlug][currency].PRICE.split(" ").slice(1).join(" ").replace(/,/g, "."),
+                openingPrice: rawData.DISPLAY[cryptoSlug][currency].OPENDAY.split(" ").slice(1).join(" ").replace(/,/g, "."),
+                lowestPrice: rawData.DISPLAY[cryptoSlug][currency].LOWDAY.split(" ").slice(1).join(" ").replace(/,/g, "."),
+                highestPrice: rawData.DISPLAY[cryptoSlug][currency].HIGHDAY.split(" ").slice(1).join(" ").replace(/,/g, "."),
+                volume: rawData.DISPLAY[cryptoSlug][currency].VOLUME24HOUR.split(" ").slice(1).join(" ").replace(/,/g, "."),
                 change: rawData.DISPLAY[cryptoSlug][currency].CHANGEPCT24HOUR,
                 imageUrl: crypto.imageUrl,
             };
