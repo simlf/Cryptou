@@ -23,6 +23,7 @@ model Feed {
   id              Int       @id @default(autoincrement())
   name            String
   url             String    @unique
+  languageName    String
   lastFetched     DateTime?
   lastArticleDate DateTime?
   Article         Article[]

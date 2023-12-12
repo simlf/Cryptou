@@ -1,6 +1,7 @@
 import Parser, {Item} from 'rss-parser';
 import { PrismaClient } from '@prisma/client';
 import keywordExtractor from 'keyword-extractor';
+import { LanguageName } from "keyword-extractor/types/lib/keyword_extractor";
 
 interface MediaContent {
     $: {
@@ -9,11 +10,13 @@ interface MediaContent {
         height?: string;
         width?: string;
     };
+    encoded?: string;
 }
 
 interface ExtendedItem extends Item {
     mediaContent?: MediaContent;
     mediaThumbnail?: MediaContent;
+    contentEncoded?: string;
 }
 
 class RssParser {
@@ -25,23 +28,46 @@ class RssParser {
             customFields: {
                 item: [
                     ['media:content', 'mediaContent'],
-                    ['media:thumbnail', 'mediaThumbnail']
+                    ['media:thumbnail', 'mediaThumbnail'],
+                    ['content:encoded', 'contentEncoded']
                 ]
             }
         });
         this.prisma = new PrismaClient();
     }
 
-    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date): Promise<void> {
-        const feed = await this.parser.parseString(feedContent);
+    public async canParseFeed(feedContent: string): Promise<boolean> {
+        try {
+            const feed = await this.parser.parseString(feedContent);
 
-        for (const item of feed.items) {
-            const articleDate = new Date(item.pubDate || Date.now());
-            if (!lastArticleDate || articleDate > lastArticleDate) {
-                const keywords = this.extractKeywords(item.contentSnippet || item.content || '');
-                await this.storeArticleWithKeywords(feedId, item, keywords);
+            // Check if the feed has at least one item and validate its structure
+            if (feed.items && feed.items.length > 0) {
+                const firstItem = feed.items[0];
+                if (firstItem.title && firstItem.link) {
+                    return true;
+                }
             }
+            return false;
+        } catch (err) {
+            console.error('canParseFeed():', err);
+            return false;
         }
+    }
+
+    public async parseAndStore(feedId: number, feedContent: string, lastArticleDate: Date, languageName: string): Promise<void> {
+        await this.parser.parseString(feedContent, async (err, feed) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            for (const item of feed.items) {
+                const articleDate = new Date(item.pubDate || Date.now());
+                if (!lastArticleDate || articleDate > lastArticleDate) {
+                    const keywords = this.extractKeywords(item.contentSnippet || item.content || '', languageName);
+                    await this.storeArticleWithKeywords(feedId, item, keywords);
+                }
+            }
+        })
     }
 
     private async storeArticleWithKeywords(feedId: number, item: Parser.Item, keywords: string[]): Promise<void> {
@@ -92,9 +118,11 @@ class RssParser {
         });
     }
 
-    private extractKeywords(content: string): string[] {
+    private extractKeywords(content: string, languageName: string): string[] {
+        const language = languageName as LanguageName;
+
         return keywordExtractor.extract(content, {
-            language: "english",
+            language: language,
             remove_digits: true,
             return_changed_case: true,
             remove_duplicates: true
@@ -114,11 +142,24 @@ class RssParser {
             return item.enclosure.url;
         }
 
-        // Check for images embedded in description/content
-        const content = item.content || item.contentSnippet || '';
+        // Check for images embedded in content:encoded, content, or contentSnippet
+        let content: string = '';
+
+        // If content:encoded is a string, use it directly
+        if (typeof item.contentEncoded === 'string') {
+            content = item.contentEncoded;
+        } else if (item.content && typeof item.content === 'string') {
+            // If 'content' is a string, use it
+            content = item.content;
+        } else if (item.contentSnippet && typeof item.contentSnippet === 'string') {
+            // If 'contentSnippet' is a string, use it
+            content = item.contentSnippet;
+        }
+
+        // Use a regex to extract the image URL from the content
         const imgRegex = /<img.*?src=["'](.*?)["']/;
         const imgMatch = content.match(imgRegex);
-        if (imgMatch) {
+        if (imgMatch && imgMatch[1]) {
             return imgMatch[1];
         }
         return '';

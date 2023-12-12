@@ -2,7 +2,6 @@ import prisma from "../lib/prisma";
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
-// import { authenticateToken } from "../middlewares/auth";
 const router = express.Router();
 
 /**
@@ -11,8 +10,6 @@ const router = express.Router();
  *   get:
  *     summary: get users [protected by authentication]
  */
-
-// router.get("/users", authenticateToken, async (req: Request, res: Response) => {
 router.get("/users", async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
