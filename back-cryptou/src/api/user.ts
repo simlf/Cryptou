@@ -3,6 +3,8 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 const router = express.Router();
+import authenticate from "../middlewares/auth";
+import authorizeAdmin from "../middlewares/authAdmin";
 
 /**
  * @openapi
@@ -24,7 +26,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.get("/users", async (req: Request, res: Response) => {
+router.get("/users", authenticate, async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -116,7 +118,7 @@ router.post("/register", async (req: Request, res: Response) => {
         defaultCurrency,
         role,
         keywords,
-        token: generateToken(email),
+        token: generateToken(email, roleExists.role),
       },
     });
 
@@ -134,13 +136,10 @@ router.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-// Function to generate JWT token
-function generateToken(email: string): string {
-  const secret = process.env.JWT_SECRET || "your-secret-key";
-  console.log("Secret utilisé pour signer le token :", secret);
-
-  const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
-  console.log("Token généré avec succès :", token);
+// Function to generate JWT token for an admin or a user
+function generateToken(email: string, role: string): string {
+  const secret = process.env.JWT_SECRET || 'your-secret-key';
+  const token = jwt.sign({ email, role }, secret, { expiresIn: '1h' });
   return token;
 }
 
