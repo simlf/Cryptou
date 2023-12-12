@@ -112,9 +112,8 @@ class RssParser {
                     where: {id: feedId},
                     data: {lastArticleDate: articleDate},
                 });
-            } else {
-                console.log(`Skipping article ${item.link} - already exists.`);
             }
+            // ELSE the article already exists, so do nothing
         });
     }
 
