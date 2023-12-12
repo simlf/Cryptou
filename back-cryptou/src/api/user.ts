@@ -8,7 +8,21 @@ const router = express.Router();
  * @openapi
  * /users:
  *   get:
- *     summary: get users [protected by authentication]
+ *     tags:
+ *       - User
+ *     summary: Retrieves a list of users
+ *     description: This endpoint is protected and requires authentication. It returns a list of all registered users.
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error
  */
 router.get("/users", async (req: Request, res: Response) => {
   try {
@@ -23,9 +37,47 @@ router.get("/users", async (req: Request, res: Response) => {
 
 /**
  * @openapi
- * /users:
+ * /register:
  *   post:
- *     summary: create new user
+ *     tags:
+ *       - User
+ *     summary: Registers a new user
+ *     description: Creates a new user with the provided information.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - defaultCurrency
+ *               - role
+ *               - keywords
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email of the user
+ *               password:
+ *                 type: string
+ *                 description: Password for the user account
+ *               defaultCurrency:
+ *                 type: string
+ *                 description: Default currency for the user
+ *               role:
+ *                 type: string
+ *                 description: Role of the user in the system
+ *               keywords:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Keywords associated with the user
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *       500:
+ *         description: Internal server error due to an issue in user creation
  */
 router.post("/register", async (req: Request, res: Response) => {
   try {
@@ -71,7 +123,26 @@ function generateToken(email: string): string {
  * @openapi
  * /login:
  *   post:
- *     summary: connect user
+ *     tags:
+ *       - User
+ *     summary: Logs in a user
+ *     description: Authenticates a user with the provided email and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *       401:
+ *         description: Unauthorized - Email or password incorrect
  */
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;

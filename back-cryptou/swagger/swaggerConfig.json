@@ -26,6 +26,10 @@
       {
         "name": "Keywords",
         "description": "Endpoints for fetching keywords."
+      },
+      {
+        "name": "User",
+        "description": "Endpoints for user authentication."
       }
     ]
   },
