@@ -1,53 +1,27 @@
-# ---- Build Stage ----
 # Use a specific Node.js version
-FROM node:21 as builder
+FROM node:21
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json, package-lock.json, and yarn.lock to the container
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 COPY yarn.lock ./
 
-# Install all dependencies, including 'devDependencies'
+# Copy the entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+
+# Install app dependencies
 RUN yarn
 
-# Copy the application source code to the container
+# Copy the rest of the app source code to the container
 COPY . .
-
-# Build the application (if you have a build script)
-# RUN yarn build
-
-# ---- Production Stage ----
-# Use a specific Node.js version
-FROM node:21-slim
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy package.json, package-lock.json, and yarn.lock
-COPY package*.json ./
-COPY yarn.lock ./
-
-# Install only production dependencies
-RUN yarn install --production
-
-# Copy the built application and the entrypoint script from the builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/entrypoint.sh /entrypoint.sh
-
-# Ensure the entrypoint script is executable
-RUN chmod +x /entrypoint.sh
 
 # Expose the port that the node.js app will run on
 EXPOSE 3000
 
-# Set up a runtime user (optional but recommended for security)
-RUN useradd -m appuser
-USER appuser
-
 # Set the script as the entry point
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Command to start the node.js app in production mode
-CMD [ "node", "dist/index.js" ]
+# # Command to start the node.js app in development mode
+CMD [ "yarn", "start:prod" ]
