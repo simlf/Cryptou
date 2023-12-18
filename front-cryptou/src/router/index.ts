@@ -32,7 +32,7 @@ const router = createRouter({
             component: RegisterView,
         },
         {
-            path: "/graph",
+            path: "/graph/:cmid?",
             name: routeNames.graph,
             component: GraphView,
         },

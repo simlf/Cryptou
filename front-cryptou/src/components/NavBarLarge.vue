@@ -7,10 +7,10 @@ const {mobile} = useDisplay();
 
 <template>
     <div class="top-bar">
-      <v-col class="logo-wrapper">
+      <router-link to="/" class="logo-wrapper">
         <img src="../assets/logo.svg" alt="Logo" class="logo" />
         <p :class="{'topline': mobile}">Illuminate Your Crypto Journey with<br><strong>Cryptou</strong></p>
-      </v-col>
+      </router-link>
       <v-col class="top-bar-right-section">
         <router-link to="/articles" v-show="!mobile">
             <span class="top-nav-link">Articles</span>
@@ -52,6 +52,7 @@ const {mobile} = useDisplay();
   width: 100%;
   padding-right: 20px;
   justify-content: flex-end;
+  text-decoration: none;
 }
 
 .top-nav-link {
@@ -70,6 +71,8 @@ const {mobile} = useDisplay();
   display: flex;
   justify-content: start;
   align-items: center;
+  color: black;
+  text-decoration: none;
 }
 
 span {
