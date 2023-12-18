@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      run: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: postgres
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: cryptou
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: cryptou_prod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    run: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cryptou-api
+spec:
+  selector:
+    matchLabels:
+      run: cryptou-api
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: cryptou-api
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: cryptou-api
+          image: eu.gcr.io/gotime-403610/gotime-api:latest
+          ports:
+            - containerPort: 4000
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_NAME
+              value: cryptou_prod
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cryptou-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    run: cryptou-api
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cryptou-client
+spec:
+  selector:
+    matchLabels:
+      run: cryptou-client
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: cryptou-client
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: cryptou-client
+          image: eu.gcr.io/gotime-403610/gotime-client:latest
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: vue-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cryptou-client-service
+spec:
+  type: LoadBalancer
+  selector:
+    run: cryptou-client
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
