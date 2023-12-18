@@ -25,7 +25,7 @@ app.use(cors());
 
 // routes
 app.use(cryptoRoutes);
-app.use(articlesRoutes);
+app.use("/articles", articlesRoutes);
 app.use(userRoutes);
 app.use(feedsRoutes);
 app.use(keywordsRoutes);

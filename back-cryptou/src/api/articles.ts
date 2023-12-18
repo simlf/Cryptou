@@ -1,6 +1,17 @@
 import express, { Request, Response } from 'express';
 const router = express.Router();
 import prisma from "../lib/prisma";
+import authenticateOptional from "../middlewares/authenticateOptional";
+import userService from "../services/userService";
+
+interface ArticlesQueryParams {
+    startDate?: string;
+    endDate?: string;
+    page?: string;
+    pageSize?: string;
+    keywords?: string;
+    feedName?: string;
+}
 
 /**
  * @openapi
@@ -85,97 +96,76 @@ import prisma from "../lib/prisma";
  *                           name:
  *                             type: string
  */
-router.get('/articles', async (req: Request, res: Response) => {
-    const { startDate, endDate, page = '1', pageSize = '9' } = req.query;
 
-    const pageNumber = parseInt(String(page), 10);
-    const size = parseInt(String(pageSize), 10);
+router.get('/', authenticateOptional, async (req: Request, res: Response) => {
+    const queryParams = req.query as ArticlesQueryParams;
+    const { startDate, endDate, page = '1', pageSize = '9', keywords, feedName } = queryParams;
+
+    const pageNumber = parseInt(page as string, 10);
+    const size = parseInt(pageSize as string, 10);
     const offset = (pageNumber - 1) * size;
-
-    let keywords: string[] = [];
-    let feedNames: string[] = [];
-
-    if (typeof req.query.keywords === 'string') {
-        keywords = req.query.keywords.split(',').map(k => k.trim());
-    }
-
-    if (typeof req.query.feedName === 'string') {
-        feedNames = req.query.feedName.split(',').map(fn => fn.trim());
-    }
 
     let queryConditions: any = {};
 
-    if (startDate && typeof startDate === 'string') {
-        queryConditions.date = { ...(queryConditions.date || {}), gte: new Date(startDate) };
-    }
+    // Logic for authenticated users
+    if (req.body.userId) {
+        if (!keywords && !startDate && !endDate && !feedName) {
+            // User is logged in but no query parameters are provided
+            const userKeywords = await userService.getUserKeywords(req.body.userId);
+            if (userKeywords.length > 0) {
+                queryConditions.keywords = {
+                    some: {
+                        Keyword: {
+                            keyword: {
+                                in: userKeywords
+                            }
+                        }
+                    }
+                };
+            }
+        } else {
+            if (keywords) {
+                const keywordsArray = keywords.split(',').map((k: string) => k.trim());
+                queryConditions.keywords = {
+                    some: {
+                        Keyword: {
+                            keyword: {
+                                in: keywordsArray
+                            }
+                        }
+                    }
+                };
+            }
 
-    if (endDate && typeof endDate === 'string') {
-        queryConditions.date = { ...(queryConditions.date || {}), lte: new Date(endDate) };
+            if (startDate) {
+                queryConditions.date = { ...(queryConditions.date || {}), gte: new Date(startDate as string) };
+            }
+
+            if (endDate) {
+                queryConditions.date = { ...(queryConditions.date || {}), lte: new Date(endDate as string) };
+            }
+
+            if (feedName) {
+                const feedNames = feedName.split(',').map(fn => fn.trim());
+                queryConditions.feed = {
+                    name: {
+                        in: feedNames
+                    }
+                };
+            }
+        }
     }
 
     try {
         const articles = await prisma.article.findMany({
-            where: {
-                ...queryConditions,
-                ...(keywords.length > 0 ? {
-                    keywords: {
-                        some: {
-                            Keyword: {
-                                keyword: {
-                                    in: keywords
-                                }
-                            }
-                        }
-                    }
-                } : {}),
-                ...(feedNames.length > 0 ? {
-                    feed: {
-                        name: {
-                            in: feedNames
-                        }
-                    }
-                } : {})
-            },
-            select: {
-                id: true,
-                title: true,
-                pageUrl: true,
-                imageUrl: true,
-                feed: {
-                    select: {
-                        name: true
-                    }
-                }
-            },
-            orderBy: { date: 'desc' },
+            where: queryConditions,
+            orderBy: { date: 'desc' }, // Assuming you want to order by date
             take: size,
             skip: offset
         });
 
-        // Counting the total articles
-        const totalArticles = await prisma.article.count({
-            where: {
-                ...queryConditions,
-                ...(keywords.length > 0 ? {
-                    keywords: {
-                        some: {
-                            Keyword: {
-                                keyword: {
-                                    in: keywords
-                                }
-                            }
-                        }
-                    }
-                } : {}),
-                ...(feedNames.length > 0 ? {
-                    feed: {
-                        name: {
-                            in: feedNames
-                        }
-                    }
-                } : {})
-            },
-        });
+        const totalArticles = await prisma.article.count({ where: queryConditions });
+
         res.json({ articles, totalArticles });
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -185,7 +175,6 @@ router.get('/articles', async (req: Request, res: Response) => {
         }
     }
 });
-
 
 /**
  * @openapi
@@ -234,7 +223,7 @@ router.get('/articles', async (req: Request, res: Response) => {
  *       500:
  *         description: Server error.
  */
-router.get('/articles/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
     const articleId = parseInt(req.params.id);
 
     try {
