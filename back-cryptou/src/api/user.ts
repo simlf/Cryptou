@@ -3,14 +3,30 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 const router = express.Router();
+import authenticate from "../middlewares/auth";
+import authorizeAdmin from "../middlewares/authAdmin";
 
 /**
  * @openapi
  * /users:
  *   get:
- *     summary: get users [protected by authentication]
+ *     tags:
+ *       - User
+ *     summary: Retrieves a list of users
+ *     description: This endpoint is protected and requires authentication. It returns a list of all registered users.
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error
  */
-router.get("/users", async (req: Request, res: Response) => {
+router.get("/users", authenticate, async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -23,18 +39,78 @@ router.get("/users", async (req: Request, res: Response) => {
 
 /**
  * @openapi
- * /users:
+ * /register:
  *   post:
- *     summary: create new user
+ *     tags:
+ *       - User
+ *     summary: Registers a new user
+ *     description: Creates a new user with the provided information. It checks if the email is already in use and if the specified role is valid.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - defaultCurrency
+ *               - role
+ *               - keywords
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email of the user. Must be unique.
+ *               password:
+ *                 type: string
+ *                 description: Password for the user account.
+ *               defaultCurrency:
+ *                 type: string
+ *                 description: Default currency for the user.
+ *               role:
+ *                 type: integer
+ *                 description: Role ID of the user in the system. Must be a valid existing role.
+ *               keywords:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Keywords associated with the user.
+ *     responses:
+ *       201:
+ *         description: User registered successfully. Returns the created user data.
+ *       400:
+ *         description: Bad request. Invalid role specified.
+ *       409:
+ *         description: Conflict. Email already in use.
+ *       500:
+ *         description: Internal server error due to an issue in user creation.
  */
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, defaultCurrency, role, keywords, token } =
-      req.body;
+    const { email, password, defaultCurrency, role, keywords } = req.body;
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (existingUser) {
+      return res.status(409).send("Email already in use");
+    }
+
+    const roleExists = await prisma.role.findUnique({
+      where: { id: role },
+    });
+
+    if (!roleExists) {
+      return res.status(400).send("Invalid role specified");
+    }
+
     const saltRounds = 3;
     const salt = await bcrypt.genSalt(saltRounds);
-    // Hach password
     const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = await prisma.user.create({
       data: {
         email,
@@ -42,28 +118,28 @@ router.post("/register", async (req: Request, res: Response) => {
         defaultCurrency,
         role,
         keywords,
-        token: generateToken(email),
+        token: generateToken(email, roleExists.role),
       },
     });
 
-    res.json(newUser);
-    res.send("User registered successfully! ");
-  } catch (e: any) {
-    console.error("error :", e);
+    res.status(201).json(newUser); // 201 Created
+  } catch (e) {
+    console.error("Registration error:", e);
+
+    // Type assertion to handle the error object
+    const error = e as Error;
+
     res.status(500).json({
-      error: "error",
-      details: e.message,
+      error: "Internal server error",
+      details: error.message,
     });
   }
 });
 
-// Function to generate JWT token
-function generateToken(email: string): string {
-  const secret = process.env.JWT_SECRET || "your-secret-key";
-  console.log("Secret utilisé pour signer le token :", secret);
-
-  const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
-  console.log("Token généré avec succès :", token);
+// Function to generate JWT token for an admin or a user
+function generateToken(email: string, role: string): string {
+  const secret = process.env.JWT_SECRET || 'your-secret-key';
+  const token = jwt.sign({ email, role }, secret, { expiresIn: '1h' });
   return token;
 }
 
@@ -71,27 +147,51 @@ function generateToken(email: string): string {
  * @openapi
  * /login:
  *   post:
- *     summary: connect user
+ *     tags:
+ *       - User
+ *     summary: Logs in a user
+ *     description: Authenticates a user with the provided email and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *       401:
+ *         description: Unauthorized - Email or password incorrect
  */
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-  if (!user) {
-    return res.status(401).send("Email or password incorrect");
+    if (!user) {
+      return res.status(401).send("Email or password incorrect");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).send("Email or password incorrect");
+    }
+
+    res.send("Login successful!");
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).send("An error occurred during login");
   }
-
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) {
-    return res.status(401).send("Email or password incorrect");
-  }
-
-  res.send("Connexion réussie!");
 });
 
 export default router;
