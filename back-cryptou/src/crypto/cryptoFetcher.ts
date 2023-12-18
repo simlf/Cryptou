@@ -118,7 +118,6 @@ export class CryptoFetcher {
 
     public static async getCryptoGraphData (slugName: string, currency: string, max: number, min: number, unit: string): Promise<CryptoChartData[]> {
         const apiKey: string = process.env.CRYPTO_API_KEY || "";
-        console.log("key ", apiKey);
         const cryptoListPrice: CryptoChartData[] = [];
         let limit = CryptoFetcher.getLimit(max, min, unit);
         if (limit > 2000 || limit < 0) limit = 2000;
