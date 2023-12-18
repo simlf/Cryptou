@@ -16,7 +16,7 @@ RUN yarn
 COPY . .
 
 # Build the app for production
-RUN yarn run build
+RUN yarn run start:prod
 
 
 # production stage
