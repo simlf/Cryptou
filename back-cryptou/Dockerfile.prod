@@ -1,32 +1,53 @@
+# ---- Build Stage ----
 # Use a specific Node.js version
-FROM node:21 as build-stage
+FROM node:21 as builder
+
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
+# Copy package.json, package-lock.json, and yarn.lock to the container
 COPY package*.json ./
-
-# Copy yarn.lock to the container
 COPY yarn.lock ./
 
-# Install dependencies
+# Install all dependencies, including 'devDependencies'
 RUN yarn
 
-# Copy the rest of the app source code to the container
+# Copy the application source code to the container
 COPY . .
 
-# Build the app for production
-RUN yarn run start:prod
+# Build the application (if you have a build script)
+RUN yarn build
 
+# ---- Production Stage ----
+# Use a specific Node.js version
+FROM node:21-slim
 
-# production stage
-FROM nginx:stable-alpine as production-stage
+# Set the working directory inside the container
+WORKDIR /app
 
-# Copy the built app to the nginx server
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Copy package.json, package-lock.json, and yarn.lock
+COPY package*.json ./
+COPY yarn.lock ./
 
-# Expose the port that the nginx server will run on
-EXPOSE 443
+# Install only production dependencies
+RUN yarn install --production
 
-# Start the nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Copy the built application and the entrypoint script from the builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/entrypoint.sh /entrypoint.sh
+
+# Ensure the entrypoint script is executable
+RUN chmod +x /entrypoint.sh
+
+# Expose the port that the node.js app will run on
+EXPOSE 3000
+
+# Set up a runtime user (optional but recommended for security)
+RUN useradd -m appuser
+USER appuser
+
+# Set the script as the entry point
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Command to start the node.js app in production mode
+CMD [ "node", "dist/index.js" ]
