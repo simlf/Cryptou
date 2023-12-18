@@ -129,7 +129,7 @@ onMounted(async () => {
         <CustomSelectorMulti
             v-model="selectedKeywords"
             :arrayChoices="keywords"
-            placeholder="Select keyword(s)"
+            placeholder="Select keyword(s) 🔎"
             colorBackground="#48A9A6"
         />
       </v-col>
