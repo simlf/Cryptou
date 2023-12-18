@@ -24,22 +24,22 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           gcloud auth configure-docker
-          cd apiTimemanager
-          docker build -t eu.gcr.io/gotime-403610/gotime-api:latest .
-          docker push eu.gcr.io/gotime-403610/gotime-api:latest
+          cd back-cryptou
+          docker build -t eu.gcr.io/cryptou/cryptou-api:latest .
+          docker push eu.gcr.io/cryptou/cryptou-api:latest
           
-          cd ../clientTimeManager
-          docker build -f Dockerfile.prod -t eu.gcr.io/gotime-403610/gotime-client:latest .
-          docker push eu.gcr.io/gotime-403610/gotime-client:latest
+          cd ../front-cryptou
+          docker build -f Dockerfile.prod -t eu.gcr.io/cryptou/cryptou-client:latest .
+          docker push eu.gcr.io/cryptou/cryptou-client:latest
 
       - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
-          gcloud container clusters get-credentials gotime --zone europe-west9 --project gotime-403610
+          gcloud container clusters get-credentials cryptou --zone europe-west1 --project cryptou
           gcloud components install kubectl
 
       - name: Deploy new image
         run: |
-          kubectl apply -f gotime-deployement.yaml
+          kubectl apply -f cryptou-deployement.yaml

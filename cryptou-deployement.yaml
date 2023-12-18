@@ -58,7 +58,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: cryptou-api
-          image: eu.gcr.io/gotime-403610/gotime-api:latest
+          image: eu.gcr.io/cryptou/cryptou-api:latest
           ports:
             - containerPort: 4000
           env:
@@ -108,7 +108,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: cryptou-client
-          image: eu.gcr.io/gotime-403610/gotime-client:latest
+          image: eu.gcr.io/cryptou/cryptou-client:latest
           ports:
             - containerPort: 8081
           envFrom:
