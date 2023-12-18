@@ -1,18 +1,20 @@
 <template>
-  <div class="crypto-wrapper" v-if="loading">
-    <div class="loader"></div>
-  </div>
-  <div class="crypto-wrapper" v-else>
-    <img :src="crypto.imageUrl" alt="crypto logo" class="crypto-image">
-    <div class="crypto-info">
-      <p style="font-weight: bold">{{crypto.cryptoName}}</p>
-      <p>{{crypto.currentPrice}}
-        <sup v-if="crypto.change >= 0" style="color: green;">+{{crypto.change}} %</sup>
-        <sup v-else style="color: red;">{{crypto.change}} %</sup>
-      </p>
-      <p>{{crypto.volume}} <sup>Vol / 24h</sup></p>
+  <router-link :to="`/graph/${props.cryptoId}`" class="text-decoration-none text-black">
+    <div class="crypto-wrapper" v-if="loading">
+      <div class="loader"></div>
     </div>
-  </div>
+    <div class="crypto-wrapper" v-else>
+      <img :src="crypto.imageUrl" alt="crypto logo" class="crypto-image">
+      <div class="crypto-info">
+        <p style="font-weight: bold">{{crypto.cryptoName}}</p>
+        <p>{{crypto.currentPrice}}
+          <sup v-if="crypto.change >= 0" style="color: green;">+{{crypto.change}} %</sup>
+          <sup v-else style="color: red;">{{crypto.change}} %</sup>
+        </p>
+        <p>{{crypto.volume}} <sup>Vol / 24h</sup></p>
+      </div>
+    </div>
+  </router-link>
 </template>
 
 <script setup lang="ts">
