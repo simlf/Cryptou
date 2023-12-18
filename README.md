@@ -53,6 +53,8 @@ Before running the application, you need to set up the environment variables:
 
 3. Edit the .env file with your specific configurations.
 
+4. Add new .env file at the root of the back-cryptou folder with CRYPTO_API_KEY who is your API key from CoinMarketCap.
+
 ## Swagger/OpenAPI Documentation
 
 You can access Swagger-UI at : <YOUR-BASE-API-URL>/api-docs

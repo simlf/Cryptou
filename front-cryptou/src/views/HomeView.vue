@@ -19,8 +19,7 @@
       <v-carousel cycle height="450" hide-delimiters progress="primary" prev-icon="mdi-arrow-left" next-icon="mdi-arrow-right">
         <v-carousel-item
             v-for="(article, i) in lastArticle"
-            :key="i"
-        >
+            :key="i">
           <Articles :article="article" />
         </v-carousel-item>
       </v-carousel>
@@ -32,7 +31,7 @@
            :key="article.id">
         <Articles :article="article" />
       </div>
-      <custom-button color-background="var(--primary-dark-green)" message="See all"/>
+      <custom-button color-background="var(--primary-dark-green)" message="See all" @click="this.$router.push('/articles')"/>
     </div>
   </div>
 </template>
