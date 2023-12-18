@@ -1,7 +1,9 @@
 name: Manual deployement
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 75-deployement-on-gcp
 
 jobs:
   build_api_image:
