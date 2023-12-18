@@ -16,7 +16,7 @@ RUN yarn
 COPY . .
 
 # Build the application (if you have a build script)
-RUN yarn build
+# RUN yarn build
 
 # ---- Production Stage ----
 # Use a specific Node.js version
