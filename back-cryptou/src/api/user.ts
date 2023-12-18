@@ -3,8 +3,8 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 const router = express.Router();
-import authenticate from "../middlewares/auth";
-import authorizeAdmin from "../middlewares/authAdmin";
+import authenticate from "../middlewares/authenticate";
+import authorizeAdmin from "../middlewares/authorizeAdmin";
 
 /**
  * @openapi
@@ -26,7 +26,7 @@ import authorizeAdmin from "../middlewares/authAdmin";
  *       500:
  *         description: Internal server error
  */
-router.get("/users", authenticate, async (req: Request, res: Response) => {
+router.get("/", authenticate, async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -39,7 +39,7 @@ router.get("/users", authenticate, async (req: Request, res: Response) => {
 
 /**
  * @openapi
- * /register:
+ * /users/register:
  *   post:
  *     tags:
  *       - User
@@ -145,7 +145,7 @@ function generateToken(email: string, role: string): string {
 
 /**
  * @openapi
- * /login:
+ * /users/login:
  *   post:
  *     tags:
  *       - User
