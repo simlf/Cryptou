@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { CryptoFetcher } from "../crypto/cryptoFetcher";
 import {CryptoChartData, CryptoData, CryptoDataSql} from "../types/cryptoInterface";
+import authenticate from "../middlewares/authenticate";
+import authorizeAdmin from "../middlewares/authorizeAdmin";
 
 const router = express.Router();
 
@@ -125,8 +127,7 @@ router.get("/cryptos", async (req: Request, res: Response): Promise<void> => {
  *     tags:
  *       - Cryptocurrencies
  */
-// TODO check if the user is connected
-router.get("/cryptos/:id", async (req: Request, res: Response): Promise<void> => {
+router.get("/cryptos/:id", authenticate, async (req: Request, res: Response): Promise<void> => {
   const cryptoId = parseInt(req.params.id);
   try {
     const crypto: CryptoDataSql | null = await prisma.cryptocurrency.findUnique({
@@ -201,7 +202,7 @@ router.get("/cryptos/:id", async (req: Request, res: Response): Promise<void> =>
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - A Promise that resolves when the operation is complete
  */
-router.get("/cryptos/:cmid/history/:period", async (req: Request, res: Response): Promise<void> => {
+router.get("/cryptos/:cmid/history/:period", authenticate, async (req: Request, res: Response): Promise<void> => {
   const cryptoId = parseInt(req.params.cmid);
   const period = req.params.period;
 
@@ -340,8 +341,7 @@ router.get("/cryptos/graph/:cmid/:unit/:min/:max", async (req: Request, res: Res
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - A Promise that resolves when the operation is complete
  */
-// TODO check if the user is connected and admin
-router.delete("/cryptos/:cmid", async (req: Request, res: Response): Promise<void> => {
+router.delete("/cryptos/:cmid", authorizeAdmin, async (req: Request, res: Response): Promise<void> => {
     const cryptoId = parseInt(req.params.cmid);
     try {
       const response = await prisma.cryptocurrency.delete({
@@ -410,8 +410,7 @@ router.delete("/cryptos/:cmid", async (req: Request, res: Response): Promise<voi
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - A Promise that resolves when the operation is complete
  */
-// TODO check if the user is connected and admin
-router.post("/cryptos", async (req: Request, res: Response): Promise<void> => {
+router.post("/cryptos", authorizeAdmin,async (req: Request, res: Response): Promise<void> => {
     const { fullName, slugName, imageUrl } = req.body;
     try {
         const response = await prisma.cryptocurrency.create({
