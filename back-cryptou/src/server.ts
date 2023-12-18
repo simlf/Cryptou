@@ -1,3 +1,4 @@
+require('dotenv').config();
 import swaggerRoutes from "./api/swagger";
 import articlesRoutes from "./api/articles";
 import userRoutes from "./api/user";
@@ -8,6 +9,7 @@ const express = require("express");
 import cors from 'cors';
 import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
+
 import { PrismaClient } from '@prisma/client';
 
 const app = express();
@@ -33,7 +35,7 @@ app.use(swaggerRoutes);
 
 app.options('*', cors());
 app.listen(PORT, () => {
-    console.log(`server is running on ${PORT}`);
+  console.log(`server is running on ${PORT}`);
 });
 
 async function startApplication() {
