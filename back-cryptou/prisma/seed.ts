@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from "../src/lib/prisma";
 
 async function main() {
     // Create or find the 'ADMIN' and 'USER role
@@ -38,6 +37,46 @@ async function main() {
         },
     });
 
+    // Add Bitcoin to Cryptocurrency
+    await prisma.cryptocurrency.upsert({
+        where: { fullName: 'Bitcoin' },
+        update: {},
+        create: {
+            fullName: 'Bitcoin',
+            slugName: 'BTC',
+            imageUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
+        },
+    });
+
+    await prisma.cryptocurrency.upsert({
+        where: { fullName: 'Ethereum' },
+        update: {},
+        create: {
+            fullName: 'Ethereum',
+            slugName: 'ETH',
+            imageUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+        },
+    });
+    await prisma.cryptocurrency.upsert({
+        where: { fullName: 'Doge coin' },
+        update: {},
+        create: {
+            fullName: 'Doge coin',
+            slugName: 'DOGE',
+            imageUrl: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png?1547792256',
+        },
+    });
+    await prisma.cryptocurrency.upsert({
+        where: { fullName: 'Stable coin' },
+        update: {},
+        create: {
+            fullName: 'Stable coin',
+            slugName: 'USDT',
+            imageUrl: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+        },
+    });
+
+
     // Create feeds
     await prisma.feed.upsert({
         where: { url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
@@ -45,6 +84,7 @@ async function main() {
         create: {
             url: 'https://www.coindesk.com/arc/outboundfeeds/rss/',
             name: 'CoinDesk',
+            languageName: 'english',
         },
     });
 
@@ -54,6 +94,17 @@ async function main() {
         create: {
             url: 'https://cointelegraph.com/rss',
             name: 'CoinTelegraph',
+            languageName: 'english',
+        },
+    });
+
+    await prisma.feed.upsert({
+        where: { url: 'https://the-blog.fr/feed/' },
+        update: {},
+        create: {
+            url: 'https://the-blog.fr/feed/',
+            name: 'The Blog FR',
+            languageName: 'french',
         },
     });
 }

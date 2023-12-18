@@ -23,19 +23,17 @@ model Feed {
   id              Int       @id @default(autoincrement())
   name            String
   url             String    @unique
+  languageName    String
   lastFetched     DateTime?
   lastArticleDate DateTime?
+  Article         Article[]
 }
 
 model Cryptocurrency {
-  id                Int    @id @default(autoincrement())
-  fullName          String
-  slugName          String
-  currentPrice      Int
-  openingPrice      Int
-  highestPriceOfDay Int
-  lowestPriceOfDay  Int
-  imageUrl          String
+  id       Int    @id @default(autoincrement())
+  fullName String @unique
+  slugName String
+  imageUrl String
 }
 
 model Article {
@@ -47,6 +45,8 @@ model Article {
   pageUrl  String           @unique
   imageUrl String?
   keywords ArticleKeyword[]
+  feedId   Int
+  feed     Feed             @relation(fields: [feedId], references: [id])
 }
 
 model Keyword {

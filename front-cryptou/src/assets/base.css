@@ -1,14 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
     :root {
         --primary-dark-green: rgb(72, 169, 166);
         --primary-light-green:  rgb(182, 221, 219);
-        --primary-yellow-light: rgb(255, 203, 144, 0.4);
+        --primary-yellow-light: rgb(253, 178, 87);
         --grey: rgb(128, 128, 128);
         --success-green-light: rgb(123, 222, 123);
         --error-red-light: rgb(239, 71, 71);
@@ -17,8 +14,8 @@
 
 :root {
     --primary-dark-green: rgb(72, 169, 166);
-    --primary-blue-light:  rgb(182, 221, 219);
-    --primary-yellow-light: rgb(255, 203, 144, 0.4);
+    --primary-light-green:  rgb(182, 221, 219);
+    --primary-yellow-light: rgb(253, 178, 87);
     --grey: rgb(128, 128, 128);
     --success-green-light: rgb(123, 222, 123);
     --error-red-light: rgb(239, 71, 71);

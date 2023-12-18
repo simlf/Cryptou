@@ -1,20 +1,28 @@
 <template>
   <v-container class="selector-wrapper">
-    <v-select v-model="selectedValue" :bg-color="colorBackground" :items="arrayChoices" label="Select Item" multiple class="custom-selector">
+    <v-autocomplete
+        v-model="selectedValue"
+        :items="arrayChoices"
+        :background-color="colorBackground"
+        :label="placeholder"
+        multiple
+        class="custom-selector"
+        :search-input.sync="search"
+    >
       <template v-slot:selection="{ item, index }">
         <v-chip v-if="index < 2">
           <span>{{ item.title }}</span>
         </v-chip>
         <span v-if="index === 2" class="text-grey text-caption align-self-center">
-        (+{{ selectedValue.length - 2 }} others)
-      </span>
+          (+{{ selectedValue.length - 2 }} others)
+        </span>
       </template>
-    </v-select>
+    </v-autocomplete>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { watch, ref, defineEmits } from 'vue';
+import {ref, watch} from 'vue';
 
 defineProps({
   placeholder: {
@@ -31,8 +39,9 @@ defineProps({
   },
 })
 
-let selectedValue = ref([])
-const emit = defineEmits(['update:modelValue'])
+let selectedValue = ref([]);
+const search = ref('');
+const emit = defineEmits(['update:modelValue']);
 
 watch(selectedValue, (newVal) => {
   emit('update:modelValue', newVal);
@@ -40,9 +49,8 @@ watch(selectedValue, (newVal) => {
 
 </script>
 
-
 <style scoped>
-.custom-selector{
+.custom-selector {
   width: 350px;
   height: 50px;
   border-radius: 5px;
