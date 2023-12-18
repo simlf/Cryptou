@@ -1,15 +1,17 @@
 <template>
-  <div id="chartdiv"></div>
-  <div id="tools">
-    Select data granularity
-    <input type="button" value="1 minute" id="btn_m">
-    <input type="button" value="1 hour" id="btn_h">
-    <input type="button" value="1 day" id="btn_d" class="active">
+  <div class="crypto-graph-wrapper">
+    <div id="chartdiv"/>
+    <div id="tools">
+      Select data granularity
+      <input type="button" value="1 minute" id="btn_m">
+      <input type="button" value="1 hour" id="btn_h">
+      <input type="button" value="1 day" id="btn_d" class="active">
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { CryptoChartData } from "@/types/cryptoInterface.ts";
@@ -21,13 +23,17 @@ const props = defineProps({
   }
 })
 
+let loading = ref(true);
+
 let chart: am5xy.XYChart;
+
+let root: am5.Root;
 
 async function fetchData() {
 
-  let root = am5.Root.new("chartdiv");
+  root = am5.Root.new("chartdiv");
 
-  let chart = root.container.children.push(am5xy.XYChart.new(root, {
+  chart = root.container.children.push(am5xy.XYChart.new(root, {
     panX: true,
     panY: false,
     wheelX: "panX",
@@ -213,15 +219,14 @@ async function fetchData() {
   // Set up data loader
   function loadData(unit: string, min: number, max: number, side: string) {
 
-    // round min so that selected unit would be included
-    min = am5.time.round(new Date(min), unit, 1).getTime();
-
-    let url = `http://localhost:3000/cryptos/graph/${props.cryptoId}/${unit}/${min}/${max}`;
+    let url = `http://localhost:3000/cryptos/graph/${props.cryptoId}/${unit}/${min / 1000}/${max / 1000}`;
     // Handle loaded data
     am5.net.load(url).then(function (result) {
 
+    let data: CryptoChartData[] = [];
     // Parse loaded data
-    let data = am5.JSONParser.parse(result.response);
+    data = am5.JSONParser.parse(result.response);
+
     data = data.map((item: CryptoChartData) => {
       return {
         date: new Date(item.time * 1000).getTime(), // convert Unix timestamp to JavaScript Date
@@ -232,7 +237,6 @@ async function fetchData() {
         volume: item.volumefrom
       }
     });
-      console.log(data);
 
     // Process data (convert dates and values)
     let processor = am5.DataProcessor.new(root, {
@@ -270,7 +274,6 @@ async function fetchData() {
     }
     else if (side == "left") {
       // save dates of first items so that duplicates would not be added
-      console.log(seriesFirst)
       seriesFirst[valueSeries.uid] = valueSeries.data.getIndex(0).date;
       seriesFirst[volumeSeries.uid] = volumeSeries.data.getIndex(0).date;
       seriesFirst[sbSeries.uid] = sbSeries.data.getIndex(0).date;
@@ -338,13 +341,14 @@ async function fetchData() {
     let min: number = dateAxis.getPrivate("min");
     let max: number = dateAxis.getPrivate("max");
 
+
     // if start is less than 0, means we are panning to the right, need to load data to the left (earlier days)
     if (start < 0) {
-      loadData(currentUnit, selectionMin, min, "left");
+      loadData(currentUnit, selectionMin, max, "left");
     }
     // if end is bigger than 1, means we are panning to the left, need to load data to the right (later days)
     if (end > 1) {
-      loadData(currentUnit, max, selectionMax, "right");
+      loadData(currentUnit, min, selectionMax, "right");
     }
   }
 
@@ -386,11 +390,11 @@ async function fetchData() {
   let currentUnit = "day";
 
 // initially load 30 days
-  let min = currentDate.getTime() - am5.time.getDuration("day", 30);
   let max = currentDate.getTime();
-
+  currentDate.setDate(new Date().getDate() - 30);
+  let min = currentDate.getTime();
 // limit to the data's extremes
-  let absoluteMax = max;
+  let absoluteMax = new Date();
   let absoluteMin = new Date(2000, 0, 1, 0, 0, 0, 0);
 
 // load data when panning ends
@@ -413,6 +417,7 @@ async function fetchData() {
 
   loadData("day", min, max, "none");
   await chart.appear(1000, 500);
+  loading.value = false;
 }
 
 onMounted(() => {
@@ -420,28 +425,40 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (chart) {
-    chart.dispose();
-  }
+  root.dispose();
+  chart.dispose();
 });
 
 </script>
 
 <style scoped>
+.crypto-graph-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  height: 80vh;
+}
 
 #chartdiv {
   width: 100%;
-  height: 500px;
-  max-width: 100%;
+  height: 100%;
 }
 
-#tools {
-  padding: 0.3em 1em;
-  text-align: right;
-  max-width: 100%;
+#tools input {
+  padding: 8px 16px;
+  margin: 0 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #fff;
 }
 
 #tools input.active {
-  font-weight: bold;
+  background-color: var(--primary-light-green);
+  color: #000000;
+  border-color: #4CAF50;
 }
 </style>

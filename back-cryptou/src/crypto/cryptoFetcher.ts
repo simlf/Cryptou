@@ -97,11 +97,32 @@ export class CryptoFetcher {
         }
     }
 
+    private static getLimit (max: number, min: number, unit: string): number {
+        const diff = max - min;
+        switch (unit) {
+            case "day": {
+                return Math.round(diff / 86400);
+            }
+            case "hour": {
+                return Math.round(diff / 3600);
+            }
+            case "minute": {
+                return Math.round(diff / 60);
+            }
+            default: {
+                console.error(`Unexpected unit: ${unit}`);
+                return 0;
+            }
+        }
+    }
+
     public static async getCryptoGraphData (slugName: string, currency: string, max: number, min: number, unit: string): Promise<CryptoChartData[]> {
         const apiKey: string = process.env.CRYPTO_API_KEY || "";
+        console.log("key ", apiKey);
         const cryptoListPrice: CryptoChartData[] = [];
-
-        const response = await axios.get(`https://min-api.cryptocompare.com/data/v2/histo${unit}?fsym=${slugName}&tsym=${currency}&toTs=${max}&fromTs=${min}&api_key=${apiKey}`);
+        let limit = CryptoFetcher.getLimit(max, min, unit);
+        if (limit > 2000 || limit < 0) limit = 2000;
+        const response  = await axios.get(`https://min-api.cryptocompare.com/data/v2/histo${unit}?fsym=${slugName}&tsym=${currency}&toTs=${max}&limit=${limit}&api_key=${apiKey}`);
         const rawData: CryptoChartData[] = response.data.Data.Data;
 
         rawData.forEach((element: CryptoChartData) => {
