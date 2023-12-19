@@ -20,7 +20,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@example.com',
-            password: 'securepassword',
+            password: '$2b$04$k9x0MdclXvpQ8rk4Kc3ASey1LxaooVBn1XZCGZfdzn2q8U.5bbJc.\t',
             defaultCurrency: 'EUR',
             role: adminRole.id,
         },
@@ -31,7 +31,7 @@ async function main() {
         update: {},
         create: {
             email: 'user@example.com',
-            password: 'securepassword',
+            password: '$2b$04$k9x0MdclXvpQ8rk4Kc3ASey1LxaooVBn1XZCGZfdzn2q8U.5bbJc.\t',
             defaultCurrency: 'EUR',
             role: userRole.id,
         },
