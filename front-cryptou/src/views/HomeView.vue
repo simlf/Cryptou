@@ -59,9 +59,13 @@ let lastArticle: Article[] = [];
 async function fetchLastArticle(): Promise<Article[]> {
   let response;
   if (mobile)
-    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
-  else
-    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
+    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`,{
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+        'Authorization': storage.user?.token
+      }
+    });
   return response.data.articles
 }
 

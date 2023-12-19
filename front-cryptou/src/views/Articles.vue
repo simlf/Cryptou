@@ -2,6 +2,9 @@
 import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
 import CustomSelectorMulti from "@components/CustomSelectorMulti.vue";
+import {useStore} from "@/store/useCryptoStore.ts";
+
+const storage = useStore();
 
 const dateRange = ref();
 
@@ -86,7 +89,14 @@ const fetchArticles = async () => {
       url += `&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
     }
 
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+        'Authorization': storage.user?.token
+      }
+    });
+
     articles.value = response.data.articles;
     pagination.totalArticles = response.data.totalArticles;
   } catch (error) {
