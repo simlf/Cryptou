@@ -49,7 +49,8 @@ import {useStore} from "../store/useCryptoStore.ts";
 
 const { mobile } = useDisplay();
 
-const cryptoStore = useStore();
+const storage = useStore();
+
 let loadingMarket = ref(true);
 let loadingArticle = ref(true);
 let cryptocurrencyNames: any = [];
@@ -65,13 +66,14 @@ async function fetchLastArticle(): Promise<Article[]> {
 }
 
 onMounted(async () => {
-  if (cryptoStore.cryptocurrencyNames.length === 0)
-    await cryptoStore.fetchCryptos();
-  cryptocurrencyNames = cryptoStore.cryptocurrencyNames;
+  if (storage.cryptocurrencyNames.length === 0)
+    await storage.fetchCryptos();
+  cryptocurrencyNames = storage.cryptocurrencyNames;
   loadingMarket.value = false;
   lastArticle = await fetchLastArticle();
   loadingArticle.value = false;
 });
+
 </script>
 
 <style scoped>
