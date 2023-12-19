@@ -2,7 +2,7 @@
 import CustomButton from "@components/CustomButton.vue";
 import {ref} from "vue";
 import { useDisplay } from "vuetify";
-import {useStore} from "@/store/useCryptoStore.ts";
+import {useStore} from "@/store/useCryptouStore.js";
 
 const { mobile } = useDisplay();
 const storage = useStore();
