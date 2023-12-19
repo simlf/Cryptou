@@ -171,13 +171,11 @@ function generateToken(email: string, role: string): string {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
     });
-
     if (!user) {
       return res.status(401).send("Email or password incorrect");
     }
@@ -187,7 +185,11 @@ router.post("/login", async (req, res) => {
       return res.status(401).send("Email or password incorrect");
     }
 
-    res.send("Login successful!");
+    res.send(JSON.stringify({
+      email: user.email,
+      role: user.role,
+      token: user.token,
+    }));
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).send("An error occurred during login");
