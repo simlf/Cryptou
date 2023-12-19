@@ -48,6 +48,7 @@ import axios from "axios";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
 import { useStore } from "../store/useCryptoStore.ts";
+import router from "@/router";
 
 const { mobile } = useDisplay();
 const cryptouStore = useStore();
@@ -65,10 +66,10 @@ function callLogin() {
     })
     .then((response) => {
       console.log("response : ", response.data);
-      cryptouStore.saveUser(response.data.username, response.data.role, response.data.token);
+      cryptouStore.saveUser(response.data.email, response.data.role, response.data.crypto, response.data.keywords, response.data.token);
       console.log(cryptouStore.user)
       if (response.status === 200) {
-        this.$router.push("/home");
+        router.push("/");
       }
     })
     .catch((error) => {
