@@ -2,7 +2,7 @@
 import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
 import CustomSelectorMulti from "@components/CustomSelectorMulti.vue";
-import {useStore} from "@/store/useCryptoStore.ts";
+import {useStore} from "@/store/useCryptouStore.js";
 
 const storage = useStore();
 

@@ -47,7 +47,7 @@ import WaveFooter from "../components/WaveFooter.vue";
 import axios from "axios";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
-import { useStore } from "../store/useCryptoStore.ts";
+import { useStore } from "../store/useCryptouStore.ts";
 import router from "@/router";
 
 const { mobile } = useDisplay();
