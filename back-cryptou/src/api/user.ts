@@ -57,6 +57,7 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
  *               - defaultCurrency
  *               - role
  *               - keywords
+ *               - crypto
  *             properties:
  *               email:
  *                 type: string
@@ -71,10 +72,11 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
  *                 type: integer
  *                 description: Role ID of the user in the system. Must be a valid existing role.
  *               keywords:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: String
  *                 description: Keywords associated with the user.
+ *               crypto:
+ *                 type: String
+ *                 description: Crypto associated with the user.
  *     responses:
  *       201:
  *         description: User registered successfully. Returns the created user data.
@@ -87,7 +89,7 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
  */
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, defaultCurrency, role, keywords } = req.body;
+    const { email, password, defaultCurrency, role, keywords, crypto } = req.body;
 
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -118,6 +120,7 @@ router.post("/register", async (req: Request, res: Response) => {
         defaultCurrency,
         role,
         keywords,
+        crypto,
         token: generateToken(email, roleExists.role),
       },
     });
@@ -184,11 +187,17 @@ router.post("/login", async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).send("Email or password incorrect");
     }
-
+    const newToken = generateToken(user.email, user.role.toString());
+    await prisma.user.update({
+      where: { email: email },
+      data: { token: newToken },
+    });
     res.send(JSON.stringify({
       email: user.email,
+      keywords: user.keywords,
+      crypto: user.crypto,
       role: user.role,
-      token: user.token,
+      token: newToken,
     }));
   } catch (error) {
     console.error("Login error:", error);
