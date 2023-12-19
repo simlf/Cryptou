@@ -20,7 +20,6 @@ export class CryptoFetcher {
                 change: rawData.DISPLAY[cryptoSlug][currency].CHANGEPCT24HOUR,
                 imageUrl: crypto.imageUrl,
             };
-
             return parsedData;
         } catch (error) {
             console.error(`Error fetching crypto data: ${error}`);

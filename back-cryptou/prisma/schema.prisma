@@ -14,6 +14,7 @@ model User {
   password        String
   defaultCurrency String  @default("EUR")
   role            Int
+  crypto          String?
   keywords        String?
   Role            Role    @relation(fields: [role], references: [id])
   token           String?

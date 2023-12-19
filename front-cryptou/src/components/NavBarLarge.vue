@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import CustomButton from "@components/CustomButton.vue";
+import {ref} from "vue";
 import { useDisplay } from "vuetify";
+import {useStore} from "@/store/useCryptoStore.ts";
 
 const { mobile } = useDisplay();
+const storage = useStore();
+let isConnected = ref(checkConnexion());
+
+function checkConnexion(): boolean {
+  return !!storage.user.token;
+}
 </script>
 
 <template>
@@ -18,7 +26,8 @@ const { mobile } = useDisplay();
         <router-link to="/graph" v-show="!mobile">
           <span class="top-nav-border-left top-nav-link" style="padding: 16px 10px">Crypto</span>
         </router-link>
-        <router-link to="/login">
+        <custom-button color-background="var(--primary-dark-green)" :message="storage.user.username" v-if="isConnected"/>
+        <router-link to="/login" v-else>
           <div :class="{'top-nav-border-left': !mobile, 'top-nav-link': true}">
             <custom-button color-background="var(--primary-dark-green)" message="Login"/>
           </div>

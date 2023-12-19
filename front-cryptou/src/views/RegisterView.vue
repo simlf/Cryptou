@@ -36,10 +36,11 @@
         @update:modelValue="selectedCrypto = $event"
       />
       <custom-button
-        message="Choose your currency"
+        message="Register"
         colorBackground="var(--primary-dark-green)"
-        @onClick="console.log(selectedCrypto)"
+        @onClick="callRegister"
       />
+      <p style="color: red" v-if="alreadyUsed">Email already used.</p>
     </div>
     <wave-footer v-if="mobile" />
   </div>
@@ -51,17 +52,66 @@ import CustomTextField from "../components/CustomTextField.vue";
 import CustomSelectorOne from "../components/CustomSelectorOne.vue";
 import CustomSelectorMulti from "../components/CustomSelectorMulti.vue";
 import WaveFooter from "../components/WaveFooter.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useDisplay } from "vuetify";
+import axios from "axios";
+import router from "@/router";
+import {useStore} from "@/store/useCryptoStore.ts";
 const { mobile } = useDisplay();
 
-const currencyArray = ["euro", "dollar", "pound", "yen"];
-const cryptoArray = ["Bitcoin", "Ethereum", "Doge coin", "Stable coin"];
+const cryptouStore = useStore();
+
+const currencyArray = ["EUR", "USD", "JPY"];
+let cryptoArray = ref([]);
 
 let email = ref("");
 let password = ref("");
 let selectedCurrency = ref("");
 let selectedCrypto = ref([]);
+let alreadyUsed = ref(false);
+
+function isValidEmail(email) {
+  var regex = /^[^@]+@[^@]+$/;
+  return regex.test(email);
+}
+
+
+onMounted(async() => {
+  if (cryptouStore.cryptocurrencyNames.length === 0)
+    await cryptouStore.fetchCryptos();
+  cryptoArray.value = cryptouStore.cryptocurrencyNames.map(item => item.name);
+})
+
+function callRegister() {
+  if (!isValidEmail(email.value)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+  axios
+      .post("http://localhost:3000/users/register", {
+        email: email.value,
+        password: password.value,
+        defaultCurrency: selectedCurrency.value,
+        role: 2,
+        keywords: "",
+        crypto: selectedCrypto.value.join(";")
+      })
+      .then((response) => {
+        console.log("response : ", response.data);
+        cryptouStore.saveUser(response.data.email, response.data.role, response.data.crypto, response.data.keywords, response.data.currency, response.data.token);
+        console.log(cryptouStore.user)
+        if (response.status === 200) {
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        if (error.response.status === 409)
+          alreadyUsed.value = true;
+        else {
+          console.log(error);
+        }
+      });
+}
 </script>
 
 <style scoped>

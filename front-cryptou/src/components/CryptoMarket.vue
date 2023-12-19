@@ -32,8 +32,8 @@ const props = defineProps({
 });
 
 async function fetchData(): Promise<CryptoData> {
-  const response = await axios.get(`http://localhost:3000/cryptos/${props.cryptoId}`)
-  return response.data
+  const response = await axios.get(`http://localhost:3000/cryptos?cmids=${props.cryptoId}`)
+  return response.data[0]
 }
 
 onMounted(async () => {

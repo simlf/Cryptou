@@ -20,7 +20,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@example.com',
-            password: 'securepassword',
+            password: '$2b$04$k9x0MdclXvpQ8rk4Kc3ASey1LxaooVBn1XZCGZfdzn2q8U.5bbJc.\t',
             defaultCurrency: 'EUR',
             role: adminRole.id,
         },
@@ -31,7 +31,7 @@ async function main() {
         update: {},
         create: {
             email: 'user@example.com',
-            password: 'securepassword',
+            password: '$2b$04$k9x0MdclXvpQ8rk4Kc3ASey1LxaooVBn1XZCGZfdzn2q8U.5bbJc.\t',
             defaultCurrency: 'EUR',
             role: userRole.id,
         },
@@ -84,16 +84,6 @@ async function main() {
         create: {
             url: 'https://www.coindesk.com/arc/outboundfeeds/rss/',
             name: 'CoinDesk',
-            languageName: 'english',
-        },
-    });
-
-    await prisma.feed.upsert({
-        where: { url: 'https://cointelegraph.com/rss' },
-        update: {},
-        create: {
-            url: 'https://cointelegraph.com/rss',
-            name: 'CoinTelegraph',
             languageName: 'english',
         },
     });

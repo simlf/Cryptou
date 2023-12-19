@@ -25,7 +25,7 @@
     <custom-button
       message="sign in"
       colorBackground="var(--primary-dark-green)"
-      @onClick="console.log('sign in')"
+      @onClick="callLogin"
     />
     <p class="register-link">
       No account ?
@@ -43,13 +43,37 @@
 import CustomButton from "../components/CustomButton.vue";
 import CustomTextField from "../components/CustomTextField.vue";
 import WaveFooter from "../components/WaveFooter.vue";
+
+import axios from "axios";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
+import { useStore } from "../store/useCryptoStore.ts";
+import router from "@/router";
 
 const { mobile } = useDisplay();
+const cryptouStore = useStore();
 
 let email = ref("");
 let password = ref("");
+
+function callLogin() {
+  axios
+      .post("http://localhost:3000/users/login", {
+        email: email.value,
+        password: password.value,
+      })
+      .then((response) => {
+        console.log("response : ", response.data);
+        cryptouStore.saveUser(response.data.email, response.data.role, response.data.crypto, response.data.keywords, response.currency, response.data.token);
+        console.log(cryptouStore.user)
+        if (response.status === 200) {
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        console.log("error : ", error);
+      });
+}
 </script>
 
 <style scoped>

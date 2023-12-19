@@ -6,7 +6,7 @@
     <div class="market-item"
          v-for="crypto in cryptocurrencyNames"
          :key="crypto.id">
-      <CryptoMarket :cryptoId="crypto.id" />
+      <CryptoMarket :cryptoId="crypto" />
     </div>
   </div>
   <hr class="separator">
@@ -41,15 +41,16 @@ import CryptoMarket from "@components/CryptoMarket.vue";
 import Articles from "@/components/ArticleComponent.vue";
 import CustomButton from "@components/CustomButton.vue";
 import axios from "axios";
-import { useCryptoStore } from "../store/cryptosStore.ts";
 import {onMounted, ref} from "vue";
 import { useDisplay } from "vuetify";
 
 import { Article } from "../types/ArticleInterface.ts";
+import {useStore} from "../store/useCryptoStore.ts";
 
 const { mobile } = useDisplay();
 
-const cryptoStore = useCryptoStore();
+const storage = useStore();
+
 let loadingMarket = ref(true);
 let loadingArticle = ref(true);
 let cryptocurrencyNames: any = [];
@@ -58,20 +59,42 @@ let lastArticle: Article[] = [];
 async function fetchLastArticle(): Promise<Article[]> {
   let response;
   if (mobile)
-    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
-  else
-    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`)
+    response = await axios.get(`http://localhost:3000/articles?page=1&pageSize=6`,{
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+        'Authorization': storage.user?.token
+      }
+    });
   return response.data.articles
 }
 
+function getFavoriteCryptos(crypotArray: string[]): number[] {
+  if (crypotArray.length > 4)
+    crypotArray = crypotArray.slice(0, 4);
+  let favoriteCryptos: number[] = [];
+  for (let i = 0; i < crypotArray.length; i++) {
+    for (let j = 0; j < storage.cryptocurrencyNames.length; j++) {
+      if (crypotArray[i] === storage.cryptocurrencyNames[j].name)
+        favoriteCryptos.push(storage.cryptocurrencyNames[j].id);
+    }
+  }
+  return favoriteCryptos;
+}
+
 onMounted(async () => {
-  if (cryptoStore.cryptocurrencyNames.length === 0)
-    await cryptoStore.fetchCryptos();
-  cryptocurrencyNames = cryptoStore.cryptocurrencyNames;
+  if (storage.cryptocurrencyNames.length === 0)
+    await storage.fetchCryptos();
+  if (storage.user.token)
+    cryptocurrencyNames = getFavoriteCryptos(storage.user.cryptoArray);
+  else
+    cryptocurrencyNames = getFavoriteCryptos(storage.cryptocurrencyNames.map(item => item.name));
+
   loadingMarket.value = false;
   lastArticle = await fetchLastArticle();
   loadingArticle.value = false;
 });
+
 </script>
 
 <style scoped>
