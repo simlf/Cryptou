@@ -41,15 +41,15 @@ import CryptoMarket from "@components/CryptoMarket.vue";
 import Articles from "@/components/ArticleComponent.vue";
 import CustomButton from "@components/CustomButton.vue";
 import axios from "axios";
-import { useCryptoStore } from "../store/cryptosStore.ts";
 import {onMounted, ref} from "vue";
 import { useDisplay } from "vuetify";
 
 import { Article } from "../types/ArticleInterface.ts";
+import {useStore} from "../store/useCryptoStore.ts";
 
 const { mobile } = useDisplay();
 
-const cryptoStore = useCryptoStore();
+const cryptoStore = useStore();
 let loadingMarket = ref(true);
 let loadingArticle = ref(true);
 let cryptocurrencyNames: any = [];

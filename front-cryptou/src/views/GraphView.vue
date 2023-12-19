@@ -23,12 +23,12 @@
 <script setup lang="ts">
 import {ref, onMounted, watch} from 'vue';
 import { useRoute } from 'vue-router';
-import { useCryptoStore } from "@/store/cryptosStore.ts";
 import axios from "axios";
 import CryptoGraph from "@components/CryptoGraph.vue";
 import CustomSelectorOne from "@components/CustomSelectorOne.vue";
 
 import { CryptoData } from "@/types/cryptoInterface.ts";
+import {useStore} from "../store/useCryptoStore.ts";
 
 let currentId = ref('');
 let currentCrypto = ref('');
@@ -44,7 +44,7 @@ const headers = [
   { title: 'Change', key: 'change' },
 ];
 
-const cryptoStore = useCryptoStore();
+const cryptoStore = useStore();
 
 async function fetchCryptoData(): Promise<CryptoData> {
   const response = await axios.get(`http://localhost:3000/cryptos?cmids=${currentId.value}`);
