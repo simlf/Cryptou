@@ -1,13 +1,24 @@
 import express, { Request, Response } from 'express';
 const router = express.Router();
-import { PrismaClient } from '@prisma/client';
+import prisma from "../lib/prisma";
+import authenticateOptional from "../middlewares/authenticateOptional";
+import userService from "../services/userService";
 
-const prisma = new PrismaClient();
+interface ArticlesQueryParams {
+    startDate?: string;
+    endDate?: string;
+    page?: string;
+    pageSize?: string;
+    keywords?: string;
+    feedName?: string;
+}
 
 /**
  * @openapi
  * /articles:
  *   get:
+ *     tags:
+ *       - Articles
  *     summary: Retrieve a list of articles
  *     parameters:
  *       - in: query
@@ -36,90 +47,126 @@ const prisma = new PrismaClient();
  *           type: string
  *         required: false
  *         description: Comma-separated list of feed names to filter articles
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         required: false
+ *         description: The page number of the articles to retrieve
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           default: 9
+ *         required: false
+ *         description: The number of articles to retrieve per page
  *     responses:
  *       200:
- *         description: A list of articles by descending date order, filtered by keywords, date range, and feed names. Includes only the feed name if available.
+ *         description: A paginated list of articles by descending date order, filtered by keywords, date range, and feed names. Includes only the feed name if available, along with pagination details.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   title:
- *                     type: string
- *                   pageUrl:
- *                     type: string
- *                   imageUrl:
- *                     type: string
- *                   feed:
+ *               type: object
+ *               required:
+ *                 - articles
+ *                 - totalArticles
+ *               properties:
+ *                 totalArticles:
+ *                   type: integer
+ *                   description: The total number of articles available.
+ *                 articles:
+ *                   type: array
+ *                   items:
  *                     type: object
  *                     properties:
- *                       name:
+ *                       id:
+ *                         type: integer
+ *                       title:
  *                         type: string
+ *                       summary:
+ *                         type: string
+ *                       pageUrl:
+ *                         type: string
+ *                       imageUrl:
+ *                         type: string
+ *                       feed:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
  */
-router.get('/articles', async (req: Request, res: Response) => {
-    const { startDate, endDate } = req.query;
-    let keywords: string[] = [];
-    let feedNames: string[] = [];
 
-    if (typeof req.query.keywords === 'string') {
-        keywords = req.query.keywords.split(',').map(k => k.trim());
-    }
+router.get('/', authenticateOptional, async (req: Request, res: Response) => {
+    const queryParams = req.query as ArticlesQueryParams;
+    const { startDate, endDate, page = '1', pageSize = '9', keywords, feedName } = queryParams;
 
-    if (typeof req.query.feedName === 'string') {
-        feedNames = req.query.feedName.split(',').map(fn => fn.trim());
-    }
+    const pageNumber = parseInt(page as string, 10);
+    const size = parseInt(pageSize as string, 10);
+    const offset = (pageNumber - 1) * size;
 
     let queryConditions: any = {};
 
-    if (startDate && typeof startDate === 'string') {
-        queryConditions.date = { ...(queryConditions.date || {}), gte: new Date(startDate) };
-    }
+    // Logic for authenticated users
+    if (req.body.userId) {
+        if (!keywords && !startDate && !endDate && !feedName) {
+            // User is logged in but no query parameters are provided
+            const userKeywords = await userService.getUserKeywords(req.body.userId);
+            if (userKeywords.length > 0) {
+                queryConditions.keywords = {
+                    some: {
+                        Keyword: {
+                            keyword: {
+                                in: userKeywords
+                            }
+                        }
+                    }
+                };
+            }
+        } else {
+            if (keywords) {
+                const keywordsArray = keywords.split(',').map((k: string) => k.trim());
+                queryConditions.keywords = {
+                    some: {
+                        Keyword: {
+                            keyword: {
+                                in: keywordsArray
+                            }
+                        }
+                    }
+                };
+            }
 
-    if (endDate && typeof endDate === 'string') {
-        queryConditions.date = { ...(queryConditions.date || {}), lte: new Date(endDate) };
+            if (startDate) {
+                queryConditions.date = { ...(queryConditions.date || {}), gte: new Date(startDate as string) };
+            }
+
+            if (endDate) {
+                queryConditions.date = { ...(queryConditions.date || {}), lte: new Date(endDate as string) };
+            }
+
+            if (feedName) {
+                const feedNames = feedName.split(',').map(fn => fn.trim());
+                queryConditions.feed = {
+                    name: {
+                        in: feedNames
+                    }
+                };
+            }
+        }
     }
 
     try {
         const articles = await prisma.article.findMany({
-            where: {
-                ...queryConditions,
-                ...(keywords.length > 0 ? {
-                    keywords: {
-                        some: {
-                            Keyword: {
-                                keyword: {
-                                    in: keywords
-                                }
-                            }
-                        }
-                    }
-                } : {}),
-                ...(feedNames.length > 0 ? {
-                    feed: {
-                        name: {
-                            in: feedNames
-                        }
-                    }
-                } : {})
-            },
-            select: {
-                id: true,
-                title: true,
-                pageUrl: true,
-                imageUrl: true,
-                feed: {
-                    select: {
-                        name: true
-                    }
-                }
-            },
-            orderBy: { date: 'desc' }
+            where: queryConditions,
+            orderBy: { date: 'desc' }, // Assuming you want to order by date
+            take: size,
+            skip: offset
         });
-        res.json(articles);
+
+        const totalArticles = await prisma.article.count({ where: queryConditions });
+
+        res.json({ articles, totalArticles });
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).json({ error: error.message });
@@ -129,11 +176,12 @@ router.get('/articles', async (req: Request, res: Response) => {
     }
 });
 
-
 /**
  * @openapi
  * /articles/{id}:
  *   get:
+ *     tags:
+ *       - Articles
  *     summary: Retrieve a specific article by its ID
  *     parameters:
  *       - in: path
@@ -175,7 +223,7 @@ router.get('/articles', async (req: Request, res: Response) => {
  *       500:
  *         description: Server error.
  */
-router.get('/articles/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
     const articleId = parseInt(req.params.id);
 
     try {

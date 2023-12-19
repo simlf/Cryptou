@@ -7,17 +7,33 @@
     "dev": "vite",
     "dev:docker": "vite --host",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^7.4.0",
+    "@amcharts/amcharts5": "^5.6.2",
+    "@amcharts/amcharts5-fonts": "^5.0.1",
+    "@amcharts/amcharts5-geodata": "^5.1.1",
+    "@types/core-js": "^2.5.8",
+    "axios": "^1.6.2",
+    "core-js": "^3.33.3",
+    "@headlessui/vue": "^1.7.16",
+    "@heroicons/vue": "^2.0.18",
     "pinia": "^2.1.7",
+    "regenerator-runtime": "^0.14.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.4.2"
+    "vuetify": "^3.4.4"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "@vitejs/plugin-vue": "^4.2.3",
     "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-plugin-vue": "^9.19.2",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.0.2",

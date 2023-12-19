@@ -2,7 +2,7 @@ import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
 import RssParser from "./rssParser";
 
-class RssFetcher {
+class FeedFetcher {
     private prisma: PrismaClient;
     private parser: RssParser;
 
@@ -16,7 +16,7 @@ class RssFetcher {
 
         const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
         const feeds = await this.prisma.feed.findMany({
-            select: { id: true, url: true, lastFetched: true, lastArticleDate: true }
+            select: { id: true, url: true, lastFetched: true, lastArticleDate: true, languageName: true }
         });
 
         for (const feed of feeds) {
@@ -26,7 +26,7 @@ class RssFetcher {
                 // Handle the potential null value for lastArticleDate
                 const lastArticleDate = feed.lastArticleDate ? new Date(feed.lastArticleDate) : new Date(0);
 
-                await this.parser.parseAndStore(feed.id, feedContent, lastArticleDate);
+                await this.parser.parseAndStore(feed.id, feedContent, lastArticleDate, feed.languageName);
 
                 await this.prisma.feed.update({
                     where: { id: feed.id },
@@ -38,10 +38,13 @@ class RssFetcher {
         }
     }
 
-    private async fetchFeed(url: string): Promise<string> {
-        const response = await axios.get(url);
-        return response.data;
+    public async fetchFeed(url: string): Promise<string> {
+        try {
+            return (await axios.get(url)).data;
+        } catch (error) {
+            throw error instanceof Error ? error : new Error('An unknown error occurred while fetching the feed');
+        }
     }
 }
 
-export default RssFetcher;
+export default FeedFetcher;

@@ -2,6 +2,7 @@
 
 ## Quick Start
 
+### Run on local machine
 Versions
 
 ```
@@ -26,6 +27,18 @@ yarn start
  -> Local: http://localhost:3000/
 ```
 
+### Run on Docker containers
+
+Make sure you have docker and docker-compose installed on your machine.
+
+Make sure you have the `.env` file in the root directory of the project (check the `.env.template` file for the required environment variables).
+
+Run the following command to start the application:
+
+```bash
+docker-compose up
+```
+
 ## Environment Configuration
 
 Before running the application, you need to set up the environment variables:
@@ -39,6 +52,8 @@ Before running the application, you need to set up the environment variables:
 ```
 
 3. Edit the .env file with your specific configurations.
+
+4. Add new .env file at the root of the back-cryptou folder with CRYPTO_API_KEY who is your API key from CoinMarketCap.
 
 ## Swagger/OpenAPI Documentation
 
@@ -54,6 +69,10 @@ How to Document Routes :
 3. Maintain Consistency: Follow the existing documentation style for consistency. Refer to already documented routes for examples.
 
 4. Testing: After adding annotations, test the route documentation by running the application and accessing the Swagger UI to ensure that the route appears correctly and the documentation is accurate.
+
+### Testing
+
+To test the authentication and the middleware using Swagger, you need to go to the Swagger UI and click on the "Authorize" button on the top right corner. Then, you need to enter the JWT token in the "Value" field. The token can be obtained by logging in using the `/login` route.
 
 
 ## Documentations

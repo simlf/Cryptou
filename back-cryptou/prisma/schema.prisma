@@ -14,6 +14,7 @@ model User {
   password        String
   defaultCurrency String  @default("EUR")
   role            Int
+  crypto          String?
   keywords        String?
   Role            Role    @relation(fields: [role], references: [id])
   token           String?
@@ -23,20 +24,17 @@ model Feed {
   id              Int       @id @default(autoincrement())
   name            String
   url             String    @unique
+  languageName    String
   lastFetched     DateTime?
   lastArticleDate DateTime?
   Article         Article[]
 }
 
 model Cryptocurrency {
-  id                Int    @id @default(autoincrement())
-  fullName          String
-  slugName          String
-  currentPrice      Int
-  openingPrice      Int
-  highestPriceOfDay Int
-  lowestPriceOfDay  Int
-  imageUrl          String
+  id       Int    @id @default(autoincrement())
+  fullName String @unique
+  slugName String
+  imageUrl String
 }
 
 model Article {
