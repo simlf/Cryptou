@@ -1,7 +1,7 @@
 import Parser, {Item} from 'rss-parser';
-import { PrismaClient } from '@prisma/client';
 import keywordExtractor from 'keyword-extractor';
 import { LanguageName } from "keyword-extractor/types/lib/keyword_extractor";
+import prisma from "../lib/prisma";
 
 interface MediaContent {
     $: {
@@ -21,7 +21,6 @@ interface ExtendedItem extends Item {
 
 class RssParser {
     private parser: Parser<ExtendedItem>;
-    private prisma: PrismaClient;
 
     constructor() {
         this.parser = new Parser({
@@ -33,7 +32,6 @@ class RssParser {
                 ]
             }
         });
-        this.prisma = new PrismaClient();
     }
 
     public async canParseFeed(feedContent: string): Promise<boolean> {
@@ -74,7 +72,7 @@ class RssParser {
         const articleDate = new Date(item.pubDate || Date.now());
         const imageUrl = this.extractImageUrl(item);
 
-        await this.prisma.$transaction(async (prisma: any) => {
+        await prisma.$transaction(async (prisma: any) => {
             const existingArticle = await prisma.article.findUnique({
                 where: { pageUrl: item.link || '' },
             });
