@@ -74,7 +74,7 @@ class RssParser {
         const articleDate = new Date(item.pubDate || Date.now());
         const imageUrl = this.extractImageUrl(item);
 
-        await this.prisma.$transaction(async (prisma) => {
+        await this.prisma.$transaction(async (prisma: any) => {
             const existingArticle = await prisma.article.findUnique({
                 where: { pageUrl: item.link || '' },
             });

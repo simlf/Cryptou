@@ -24,7 +24,8 @@
     "start": "nodemon --watch \" *.ts \" --exec \" ts-node \" ./src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "start:prod": "ts-node ./src/server.ts"
+    "tsc": "tsc",
+    "start:prod": "node build/server.js"
   },
   "name": "cryptou-back",
   "version": "1.0.0",

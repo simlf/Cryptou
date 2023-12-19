@@ -23,16 +23,16 @@ jobs:
         with:
           project_id: gotime-403610
 
-#      - name: Build and Push Docker Image
-#        run: |
-#          gcloud auth configure-docker
-#          cd back-cryptou
-#          docker build -f Dockerfile.prod -t eu.gcr.io/cryptou/cryptou-api:latest .
-#          docker push eu.gcr.io/cryptou/cryptou-api:latest
-#
-#          cd ../front-cryptou
-#          docker build -f Dockerfile.prod -t eu.gcr.io/cryptou/cryptou-client:latest .
-#          docker push eu.gcr.io/cryptou/cryptou-client:latest
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker
+          cd back-cryptou
+          docker build -f Dockerfile.prod -t eu.gcr.io/cryptou/cryptou-api:latest .
+          docker push eu.gcr.io/cryptou/cryptou-api:latest
+
+          cd ../front-cryptou
+          docker build -f Dockerfile.prod -t eu.gcr.io/cryptou/cryptou-client:latest .
+          docker push eu.gcr.io/cryptou/cryptou-client:latest
 
       - name: Install kubectl
         run: |
