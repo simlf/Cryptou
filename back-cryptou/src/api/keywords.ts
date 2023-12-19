@@ -1,8 +1,6 @@
 import express, { Request, Response } from 'express';
+import prisma from "../lib/prisma";
 const router = express.Router();
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 /**
  * @openapi
@@ -45,21 +43,5 @@ router.get('/keywords', async (req: Request, res: Response) => {
         res.status(500).json({ error: 'An error occurred while fetching keywords' });
     }
 });
-
-// router.get('/keywords', async (req: Request, res: Response) => {
-//     try {
-//         const keywords = await prisma.keyword.findMany(
-//             {
-//                 select: {
-//                     keyword: true,
-//                 },
-//             },
-//         );
-//         res.json(keywords);
-//     } catch (error: unknown) {
-//         res.status(500).json({ error: 'An error occurred while fetching keywords' });
-//     }
-// });
-
 
 export default router;

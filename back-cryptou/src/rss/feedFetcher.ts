@@ -1,13 +1,11 @@
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client';
 import RssParser from "./rssParser";
+import prisma from "../lib/prisma";
 
 class FeedFetcher {
-    private prisma: PrismaClient;
     private parser: RssParser;
 
     constructor() {
-        this.prisma = new PrismaClient();
         this.parser = new RssParser();
     }
 
@@ -15,7 +13,7 @@ class FeedFetcher {
         console.log('Running scheduled feed fetching...');
 
         const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-        const feeds = await this.prisma.feed.findMany({
+        const feeds = await prisma.feed.findMany({
             select: { id: true, url: true, lastFetched: true, lastArticleDate: true, languageName: true }
         });
 
@@ -28,7 +26,7 @@ class FeedFetcher {
 
                 await this.parser.parseAndStore(feed.id, feedContent, lastArticleDate, feed.languageName);
 
-                await this.prisma.feed.update({
+                await prisma.feed.update({
                     where: { id: feed.id },
                     data: { lastFetched: new Date() },
                 });

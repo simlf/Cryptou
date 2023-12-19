@@ -1,3 +1,5 @@
+import prisma from "./lib/prisma";
+
 require('dotenv').config();
 import swaggerRoutes from "./api/swagger";
 import articlesRoutes from "./api/articles";
@@ -9,10 +11,8 @@ const express = require("express");
 import cors from 'cors';
 import FeedFetcher from "./rss/feedFetcher";
 import cryptoRoutes from "./api/crypto";
-import { PrismaClient } from '@prisma/client';
 
 const app = express();
-const prisma = new PrismaClient();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
