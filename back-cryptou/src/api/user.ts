@@ -112,7 +112,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const saltRounds = 3;
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(password, salt);
-
+    const token = generateToken(email, roleExists.role);
     const newUser = await prisma.user.create({
       data: {
         email,
@@ -121,11 +121,18 @@ router.post("/register", async (req: Request, res: Response) => {
         role,
         keywords,
         crypto,
-        token: generateToken(email, roleExists.role),
+        token: token,
       },
     });
 
-    res.status(201).json(newUser); // 201 Created
+    res.send(JSON.stringify({
+      email: email,
+      keywords: keywords,
+      crypto: crypto,
+      role: role,
+      currency: defaultCurrency,
+      token: token,
+    })); // 201 Created
   } catch (e) {
     console.error("Registration error:", e);
 
@@ -197,6 +204,7 @@ router.post("/login", async (req, res) => {
       keywords: user.keywords,
       crypto: user.crypto,
       role: user.role,
+      currency: user.defaultCurrency,
       token: newToken,
     }));
   } catch (error) {

@@ -57,24 +57,22 @@ let email = ref("");
 let password = ref("");
 
 function callLogin() {
-  console.log("email : ", email.value);
-  console.log("password : ", password.value);
   axios
-    .post("http://localhost:3000/users/login", {
-      email: email.value,
-      password: password.value,
-    })
-    .then((response) => {
-      console.log("response : ", response.data);
-      cryptouStore.saveUser(response.data.email, response.data.role, response.data.crypto, response.data.keywords, response.data.token);
-      console.log(cryptouStore.user)
-      if (response.status === 200) {
-        router.push("/");
-      }
-    })
-    .catch((error) => {
-      console.log("error : ", error);
-    });
+      .post("http://localhost:3000/users/login", {
+        email: email.value,
+        password: password.value,
+      })
+      .then((response) => {
+        console.log("response : ", response.data);
+        cryptouStore.saveUser(response.data.email, response.data.role, response.data.crypto, response.data.keywords, response.currency, response.data.token);
+        console.log(cryptouStore.user)
+        if (response.status === 200) {
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        console.log("error : ", error);
+      });
 }
 </script>
 
