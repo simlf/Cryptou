@@ -70,14 +70,23 @@ let selectedCurrency = ref("");
 let selectedCrypto = ref([]);
 let alreadyUsed = ref(false);
 
+function isValidEmail(email) {
+  var regex = /^[^@]+@[^@]+$/;
+  return regex.test(email);
+}
+
+
 onMounted(async() => {
   if (cryptouStore.cryptocurrencyNames.length === 0)
     await cryptouStore.fetchCryptos();
   cryptoArray.value = cryptouStore.cryptocurrencyNames.map(item => item.name);
-  console.log(cryptoArray.value)
 })
 
 function callRegister() {
+  if (!isValidEmail(email.value)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
   axios
       .post("http://localhost:3000/users/register", {
         email: email.value,
