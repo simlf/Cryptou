@@ -4,6 +4,7 @@ import SettingGeneralTab from "../components/SettingGeneralTab.vue";
 import SettingFavoriteTab from "../components/SettingFavoriteTab.vue";
 import SettingPublicationTab from "../components/SettingPublicationTab.vue";
 import SettingSettingTab from "../components/SettingSettingTab.vue";
+import axios from "axios";
 
 const tabs = ref([
   { name: "General", content: "Contenu de General" },
@@ -16,6 +17,32 @@ const selectedTab = ref(tabs.value[0]);
 function selectTab(tab) {
   selectedTab.value = tab;
 }
+
+// const fetchUserData = async () => {
+//   const response = await axios.get("http://localhost:3000/users/profile");
+//   const userData = response.data;
+//   console.log(userData);
+//   return userData;
+// };
+
+const fetchUserData = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+    const response = await axios.get("http://localhost:3000/users/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const userData = response.data;
+    console.log(userData);
+    return userData;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};
+
+const userData = ref(fetchUserData());
+console.log(userData.value);
 </script>
 
 <template>
