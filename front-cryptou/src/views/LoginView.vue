@@ -119,6 +119,7 @@ hr {
 .field {
   margin: 10px 0;
   display: flex;
+  padding:8px;
 }
 
 .register-link {

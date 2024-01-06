@@ -4,7 +4,6 @@ import SettingGeneralTab from "../components/SettingGeneralTab.vue";
 import SettingFavoriteTab from "../components/SettingFavoriteTab.vue";
 import SettingPublicationTab from "../components/SettingPublicationTab.vue";
 import SettingSettingTab from "../components/SettingSettingTab.vue";
-import axios from "axios";
 
 const tabs = ref([
   { name: "General", content: "Contenu de General" },
@@ -19,30 +18,20 @@ function selectTab(tab) {
 }
 
 // const fetchUserData = async () => {
-//   const response = await axios.get("http://localhost:3000/users/profile");
-//   const userData = response.data;
-//   console.log(userData);
-//   return userData;
+//   try {
+//     const token = localStorage.getItem("userToken");
+//     const response = await axios.get("http://localhost:3000/users/profile", {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     const userData = response.data;
+//     console.log(userData);
+//     return userData;
+//   } catch (error) {
+//     console.error("Error fetching user data:", error);
+//   }
 // };
-
-const fetchUserData = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
-    const response = await axios.get("http://localhost:3000/users/profile", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const userData = response.data;
-    console.log(userData);
-    return userData;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-  }
-};
-
-const userData = ref(fetchUserData());
-console.log(userData.value);
 </script>
 
 <template>
@@ -62,14 +51,12 @@ console.log(userData.value);
       <div v-if="selectedTab.name === 'General'"><SettingGeneralTab /></div>
       <!-- Onglet Favorite -->
       <div v-if="selectedTab.name === 'Favorite'"><SettingFavoriteTab /></div>
+      <!-- Onglet Publication -->
       <div v-if="selectedTab.name === 'Publication'">
-        <!-- Onglet Publication -->
         <SettingPublicationTab />
       </div>
-      <div v-if="selectedTab.name === 'Setting'">
-        <!-- Onglet Setting -->
-        <SettingSettingTab />
-      </div>
+      <!-- Onglet Setting -->
+      <div v-if="selectedTab.name === 'Setting'"><SettingSettingTab /></div>
     </div>
   </div>
 </template>

@@ -2,10 +2,15 @@
 import CryptoIcon from "./Icons/CryptoIcon.vue";
 import FeedIcon from "./Icons/FeedIcon.vue";
 import HomeIcon from "./Icons/HomeIcon.vue";
+import SettingIcon from "./Icons/SettingIcon.vue";
 </script>
 <template>
   <v-layout>
-    <v-bottom-navigation class="bg-white" color="secondary" v-model="activeButton">
+    <v-bottom-navigation
+      class="bg-white"
+      color="secondary"
+      v-model="activeButton"
+    >
       <v-btn value="home" to="/">
         <HomeIcon />
       </v-btn>
@@ -15,6 +20,9 @@ import HomeIcon from "./Icons/HomeIcon.vue";
       <v-btn value="graph" to="/graph">
         <CryptoIcon />
       </v-btn>
+      <v-btn value="settings" to="/settings">
+        <SettingIcon />
+      </v-btn>
     </v-bottom-navigation>
   </v-layout>
 </template>
@@ -23,7 +31,7 @@ import HomeIcon from "./Icons/HomeIcon.vue";
 export default {
   data() {
     return {
-      activeButton: 'home', // This will make the "Home" button active by default
+      activeButton: "home", // This will make the "Home" button active by default
     };
   },
 };

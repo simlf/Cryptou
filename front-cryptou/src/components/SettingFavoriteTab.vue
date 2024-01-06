@@ -1,33 +1,48 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useStore } from "@/store/useCryptouStore.js";
 
-// à revoir -> ce sera une liste de string
-const cryptos = ref([
-  { name: "BTC", select: true },
-  { name: "ETH", select: false },
-  { name: "BNB", select: false },
-  { name: "XRP", select: false },
-  { name: "DOGE", select: false },
-  { name: "SOL", select: true },
-  { name: "ADA", select: true },
-  { name: "TRX", select: false },
-  { name: "DOT", select: false },
-  { name: "LINK", select: false },
-  { name: "LTC", select: false },
-]);
+const storage = useStore();
+let userCryptos = ref([]);
+let cryptoNameList = ref([]);
+let keywords = ref(storage.user.keywordArray || []);
+let newKeyword = ref("");
 
-function addKeyword() {}
+userCryptos.value = storage.user.cryptoArray[0].toString().split(", ");
+cryptoNameList.value = storage.cryptoNameList;
 
-function toggleSelect(crypto) {
-  crypto.select = !crypto.select;
-  // sauvegarder
-  saveToDatabase();
+console.log("storage", storage);
+console.log("keywords", keywords);
+
+function addKeyword() {
+  if (newKeyword.value && !keywords.value.includes(newKeyword.value)) {
+    keywords.value.push(newKeyword.value);
+    newKeyword.value = "";
+    saveUserData();
+  }
 }
 
-function saveToDatabase() {
-  // créer un tableau de string avec les noms des cryptos
-  // chaque nouvelle selection va écraser le tableau
-  console.log("save");
+function updateUserCryptos(crypto: string) {
+  const index = userCryptos.value.indexOf(crypto);
+  if (index > -1) {
+    userCryptos.value.splice(index, 1);
+  } else if (!userCryptos.value.includes(crypto)) {
+    userCryptos.value.push(crypto);
+  }
+  saveUserData();
+}
+
+function saveUserData() {
+  const { email, role, currency, token } = storage.user;
+  const cryptoString = userCryptos.value.join(",");
+  const keywords = storage.user.keywordArray.join(",");
+  storage.saveUser(email, role, cryptoString, keywords, currency, token);
+  console.log("Your preferences have been saved successfully");
+  console.log("userCryptos", userCryptos);
+}
+
+function isSelected(crypto) {
+  return userCryptos.value.includes(crypto);
 }
 </script>
 <template>
@@ -38,21 +53,36 @@ function saveToDatabase() {
       in a way to facilitate ergonomics for you.
     </p>
     <p>Select your crypto</p>
+
     <div>
       <span
         class="crypto"
-        v-for="crypto in cryptos"
-        :key="crypto.name"
-        :class="{ selected: crypto.select }"
-        @click="toggleSelect(crypto)"
+        v-for="crypto in cryptoNameList"
+        :key="crypto"
+        @click="updateUserCryptos(crypto)"
+        :class="{ selected: isSelected(crypto) }"
       >
-        {{ crypto.name }}
+        {{ crypto }}
       </span>
     </div>
+  </div>
+  <div class="profile-section">
     <h2 class="mt-10">Favorite Feeds</h2>
     <p class="profile-description">
       Track your keywords across the web without having to read everything!
     </p>
+    <p>Your keywords</p>
+    <span
+      class="keyword"
+      v-for="keyword in keywords"
+      :key="keyword"
+      :class="keyword"
+    >
+      {{ keyword }}
+    </span>
+    <br />
+    <br />
+    <input type="text" v-model="newKeyword" placeholder="Add a new keyword" />
     <button @click="addKeyword">New Keyword</button>
   </div>
 </template>
@@ -64,6 +94,11 @@ function saveToDatabase() {
 .profile-description {
   border-bottom: 2px solid #ccc;
   padding-bottom: 20px;
+}
+
+.keyword {
+  margin: 10px;
+  padding: 8px;
 }
 
 table {
@@ -100,6 +135,12 @@ button {
 }
 
 button:hover {
-  background-color: #48a9a6;
+  background-color: #68b7b4;
+}
+
+input {
+  padding: 0px 5px;
+  background-color: #f5f5f5;
+  margin-right: 20px;
 }
 </style>
