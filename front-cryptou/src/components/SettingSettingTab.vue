@@ -75,8 +75,8 @@ async function saveFluxData() {
     <div class="form-wrapper">
       <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux name" @update:modelValue="newFluxName = $event"/>
       <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux Url" @update:modelValue="newFluxUrl = $event"/>
-      <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux language" @update:modelValue="newFluxLanguage = $event"/>
-      <custom-button color-background="var(--primary-dark-green)" message="add new crytpo" @click="saveFluxData"/>
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux language (ex: fr, en, etc)" @update:modelValue="newFluxLanguage = $event"/>
+      <custom-button color-background="var(--primary-dark-green)" message="add new Flux" @click="saveFluxData"/>
     </div>
   </div>
 </template>
