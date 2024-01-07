@@ -1,17 +1,24 @@
 <script setup lang="ts">
-// import { ref } from "vue";
+import { ref } from "vue";
 import axios from "axios";
 import { useStore } from "@/store/useCryptouStore.js";
 
 const storage = useStore();
+
+let emailModel = ref(storage.user.email);
 const updateUserEmail = async () => {
   try {
-    await axios.put("http://localhost:3000/users/profile", {
-      email: storage.user.email,
+    await axios.patch("http://localhost:3000/users/profile", {
+      userId: storage.user.id,
+      email: emailModel.value,
+      }, {
       headers: {
         Authorization: `Bearer ${storage.user.token}`,
       },
     });
+
+    storage.user.email = emailModel;
+
     alert("mail updated successfully!");
   } catch (error) {
     console.error("Error updating email", error);
@@ -34,7 +41,7 @@ const updateUserEmail = async () => {
       </div>
       <form>
         <label for="email">Mail:&nbsp;&nbsp;&nbsp;</label>
-        <input type="email" id="email" v-model="storage.user.email" />
+        <input type="email" id="email" v-model="emailModel" style="border: solid 2px var(--primary-dark-green)"/>
       </form>
       <button class="button" type="button" @click="updateUserEmail">
         Update email
