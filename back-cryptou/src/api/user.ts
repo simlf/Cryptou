@@ -28,7 +28,16 @@ import authorizeAdmin from "../middlewares/authorizeAdmin";
  */
 router.get("/", authenticate, async (req: Request, res: Response) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        defaultCurrency: true,
+        keywords: true,
+        crypto: true,
+      }
+    });
+
     res.json(users);
   } catch (e: unknown) {
     console.error("error:", e);
