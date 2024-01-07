@@ -21,6 +21,7 @@
       colorBackground="var(--primary-light-green)"
       v-model="password"
       class="field"
+      type="password"
     />
     <custom-button
       message="sign in"

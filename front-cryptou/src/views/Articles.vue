@@ -3,6 +3,7 @@ import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
 import CustomSelectorMulti from "@components/CustomSelectorMulti.vue";
 import {useStore} from "@/store/useCryptouStore.js";
+import CustomButton from "@components/CustomButton.vue";
 
 const storage = useStore();
 
@@ -122,6 +123,22 @@ onMounted(async () => {
   );
   fetchArticles();
 });
+
+async function saveKeyword() {
+  try {
+    await axios.put("http://localhost:3000/users/profile", {
+      keywords: selectedKeywords.value.join(","),
+    }, {
+      headers: {
+        Authorization: `Bearer ${storage.user.token}`,
+      },
+    });
+    alert("keyword updated successfully!")
+  } catch (error) {
+    console.error("Error updating email", error);
+  }
+}
+
 </script>
 
 <template>
@@ -143,6 +160,7 @@ onMounted(async () => {
             colorBackground="#48A9A6"
         />
       </v-col>
+      <CustomButton color-background="#48A9A6" message="Save keyword" @onClick="saveKeyword()"/>
       <v-col cols="6" md="4">
         <CustomSelectorMulti
             v-model="selectedFeeds"

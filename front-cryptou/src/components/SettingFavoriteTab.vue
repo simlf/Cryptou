@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import { useStore } from "@/store/useCryptouStore.js";
+import customSelectorMulti from "@/components/CustomSelectorMulti.vue";
+import axios from "axios";
 
 const storage = useStore();
 let userCryptos = ref([]);
 let cryptoNameList = ref([]);
 let keywords = ref(storage.user.keywordArray || []);
 let newKeyword = ref("");
+let keywordList = ref([]);
 
 userCryptos.value = storage.user.cryptoArray[0].toString().split(", ");
 cryptoNameList.value = storage.cryptoNameList;
@@ -22,6 +25,12 @@ function addKeyword() {
   }
 }
 
+async function getKeywords() {
+  const response = await axios.get("http://localhost:3000/keywords");
+  keywordList.value = response.data.map((keyword) => keyword.keyword);
+  console.log("fetchedData", keywordList.value);
+}
+
 function updateUserCryptos(crypto: string) {
   const index = userCryptos.value.indexOf(crypto);
   if (index > -1) {
@@ -32,18 +41,26 @@ function updateUserCryptos(crypto: string) {
   saveUserData();
 }
 
-function saveUserData() {
-  const { email, role, currency, token } = storage.user;
-  const cryptoString = userCryptos.value.join(",");
-  const keywords = storage.user.keywordArray.join(",");
-  storage.saveUser(email, role, cryptoString, keywords, currency, token);
-  console.log("Your preferences have been saved successfully");
-  console.log("userCryptos", userCryptos);
+async function saveUserData() {
+  axios.patch("http://localhost:3000/users/profile", {
+    userId: storage.user.id,
+    keywords: keywords.value.join(","),
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
+
+  storage.user.keywordArray = keywords.value;
 }
 
 function isSelected(crypto) {
   return userCryptos.value.includes(crypto);
 }
+
+onMounted(() => {
+  getKeywords();
+});
 </script>
 <template>
   <div class="profile-section">
@@ -67,23 +84,15 @@ function isSelected(crypto) {
     </div>
   </div>
   <div class="profile-section">
-    <h2 class="mt-10">Favorite Feeds</h2>
+    <h2 class="mt-10">Favorite Keyword</h2>
     <p class="profile-description">
       Track your keywords across the web without having to read everything!
     </p>
     <p>Your keywords</p>
-    <span
-      class="keyword"
-      v-for="keyword in keywords"
-      :key="keyword"
-      :class="keyword"
-    >
-      {{ keyword }}
-    </span>
     <br />
     <br />
-    <input type="text" v-model="newKeyword" placeholder="Add a new keyword" />
-    <button @click="addKeyword">New Keyword</button>
+    <custom-selector-multi :array-choices="keywordList" color-background="var(--primary-light-green)" placeholder="select favorite keyword"/>
+    <button @click="saveUserData">Save Keyword</button>
   </div>
 </template>
 

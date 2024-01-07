@@ -273,11 +273,13 @@ router.get("/profile", authenticate, async (req: Request, res: Response) => {
 /**
  * @openapi
  * /users/profile:
- *   put:
+ *   patch:
  *     tags:
  *       - User
- *     summary: Update User Email, Default Currency, and Keywords
- *     description: Updates the email, default currency, and keywords of a user's profile. Requires an authorization token in the header.
+ *     summary: Update user profile
+ *     description: Allows authenticated users to update their profile information except for their password.
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -287,44 +289,78 @@ router.get("/profile", authenticate, async (req: Request, res: Response) => {
  *             properties:
  *               email:
  *                 type: string
- *                 description: New email of the user. Required if changing email.
+ *                 description: The new email of the user.
  *               defaultCurrency:
  *                 type: string
- *                 description: New default currency for the user. Required if changing default currency.
+ *                 description: The new default currency for the user.
+ *               role:
+ *                 type: integer
+ *                 description: The new role ID of the user in the system.
  *               keywords:
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: A list of new keywords associated with the user. Optional.
+ *                 description: The new keywords associated with the user.
  *     responses:
  *       200:
- *         description: User profile updated successfully. Returns the updated user data with new email, default currency, and keywords.
+ *         description: User profile updated successfully. Returns the updated user data.
  *       400:
- *         description: Bad request. Invalid input parameters.
+ *         description: Bad request. Invalid input data.
  *       401:
- *         description: Unauthorized - No token provided or token is invalid.
- *       404:
- *         description: Not found - User not found or unable to update.
+ *         description: Unauthorized. User not authenticated.
+ *       409:
+ *         description: Conflict. Email already in use.
  *       500:
- *         description: Internal server error due to an issue in updating the user profile.
+ *         description: Internal server error.
  */
-router.put("/profile", authenticate, async (req: Request, res: Response) => {
-  try {
-    const updateData = req.body;
-    const updatedUser = await UserService.updateUser(
-      req.body.userId.email,
-      updateData
-    );
 
-    if (!updatedUser) {
-      return res.status(404).send("User not found or unable to update");
+router.patch("/profile", authenticate, async (req: Request, res: Response) => {
+  try {
+    const userId = req.body.userId; // Assuming the user ID is set in the request body by the authentication middleware
+    const { email, defaultCurrency, keywords } = req.body;
+
+    // Email Validation
+    if (email && !validateEmail(email)) {
+      return res.status(400).send("Invalid email format.");
     }
+
+    // Check if the email is already in use by another user
+    if (email) {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(409).send("Email already in use.");
+      }
+    }
+
+    console.log("req.body:", req.body);
+    console.log("userId:", userId);
+    console.log("email:", email);
+
+    // Update user data
+    const updateData = {
+      ...(email && { email }),
+      ...(defaultCurrency && { defaultCurrency }),
+      ...(keywords && { keywords }),
+    };
+
+    console.log("updateData:", updateData);
+
+    const updatedUser = await prisma.user.update({
+      where: { email: userId.email },
+      data: updateData,
+    });
 
     res.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user profile:", error);
-    res.status(500).send("Internal server error");
+    console.error("Profile update error:", error);
+    res.status(500).send("An error occurred during profile update");
   }
 });
+
+function validateEmail(email: string): boolean {
+  // Regular expression for basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
 export default router;

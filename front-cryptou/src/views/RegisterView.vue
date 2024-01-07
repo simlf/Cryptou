@@ -22,6 +22,7 @@
         colorBackground="var(--primary-light-green)"
         v-model="password"
         class="field"
+        type="password"
       />
       <custom-selector-one
         placeholder="Select you curency"
