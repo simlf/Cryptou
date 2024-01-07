@@ -1,9 +1,10 @@
 import prisma from '../lib/prisma';
 
 class UserService {
-    static async getUserKeywords(userId: string): Promise<string[]> {
+    static async getUserKeywords(userId: any): Promise<string[]> {
+        console.debug(userId);
         const user = await prisma.user.findUnique({
-            where: { id: userId }
+            where: { email: userId.email },
         });
 
         if (user && user.keywords) {
