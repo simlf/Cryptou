@@ -45,7 +45,7 @@ import {onMounted, ref} from "vue";
 import { useDisplay } from "vuetify";
 
 import { Article } from "../types/ArticleInterface.ts";
-import {useStore} from "../store/useCryptoStore.ts";
+import {useStore} from "../store/useCryptouStore.ts";
 
 const { mobile } = useDisplay();
 

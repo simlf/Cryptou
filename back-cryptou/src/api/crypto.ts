@@ -51,6 +51,7 @@ const router = express.Router();
  */
 
 router.get("/cryptos", async (req: Request, res: Response): Promise<void> => {
+    console.debug("GET /cryptos")
   const { cmids } = req.query;
   const cryptoListInfo: CryptoData[] = [];
   try {
@@ -412,6 +413,7 @@ router.delete("/cryptos/:cmid", authorizeAdmin, async (req: Request, res: Respon
  */
 router.post("/cryptos", authorizeAdmin,async (req: Request, res: Response): Promise<void> => {
     const { fullName, slugName, imageUrl } = req.body;
+    console.log(req.body);
     try {
         const response = await prisma.cryptocurrency.create({
         data: {

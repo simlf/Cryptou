@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import CustomButton from "@components/CustomButton.vue";
-import {ref} from "vue";
+import { ref } from "vue";
 import { useDisplay } from "vuetify";
-import {useStore} from "@/store/useCryptoStore.ts";
+import { useStore } from "@/store/useCryptouStore.js";
 
 const { mobile } = useDisplay();
 const storage = useStore();
@@ -14,26 +14,46 @@ function checkConnexion(): boolean {
 </script>
 
 <template>
-    <div class="top-bar">
-      <router-link to="/" class="logo-wrapper">
-        <img src="../assets/logo.svg" alt="Logo" class="logo" />
-        <p :class="{'topline': mobile}">Illuminate Your Crypto Journey with<br><strong>Cryptou</strong></p>
+  <div class="top-bar">
+    <router-link to="/" class="logo-wrapper">
+      <img src="../assets/logo.svg" alt="Logo" class="logo" />
+      <p :class="{ topline: mobile }">
+        Illuminate Your Crypto Journey with<br /><strong>Cryptou</strong>
+      </p>
+    </router-link>
+    <v-col class="top-bar-right-section">
+      <router-link to="/articles" v-show="!mobile">
+        <span class="top-nav-link">Articles</span>
       </router-link>
-      <v-col class="top-bar-right-section">
-        <router-link to="/articles" v-show="!mobile">
-            <span class="top-nav-link">Articles</span>
-        </router-link>
-        <router-link to="/graph" v-show="!mobile">
-          <span class="top-nav-border-left top-nav-link" style="padding: 16px 10px">Crypto</span>
-        </router-link>
-        <custom-button color-background="var(--primary-dark-green)" :message="storage.user.username" v-if="isConnected"/>
-        <router-link to="/login" v-else>
-          <div :class="{'top-nav-border-left': !mobile, 'top-nav-link': true}">
-            <custom-button color-background="var(--primary-dark-green)" message="Login"/>
-          </div>
-        </router-link>
-      </v-col>
-    </div>
+      <router-link to="/graph" v-show="!mobile">
+        <span
+          class="top-nav-border-left top-nav-link"
+          style="padding: 16px 10px"
+          >Crypto</span
+        >
+      </router-link>
+      <router-link to="/settings" v-show="!mobile" v-if="isConnected">
+        <span
+          class="top-nav-border-left top-nav-link"
+          style="padding: 16px 10px"
+          >Settings</span
+        >
+      </router-link>
+      <custom-button
+        color-background="var(--primary-dark-green)"
+        :message="storage.user.username"
+        v-if="isConnected"
+      />
+      <router-link to="/login" v-else>
+        <div :class="{ 'top-nav-border-left': !mobile, 'top-nav-link': true }">
+          <custom-button
+            color-background="var(--primary-dark-green)"
+            message="Login"
+          />
+        </div>
+      </router-link>
+    </v-col>
+  </div>
 </template>
 
 <style scoped>

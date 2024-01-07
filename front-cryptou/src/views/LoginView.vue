@@ -21,6 +21,7 @@
       colorBackground="var(--primary-light-green)"
       v-model="password"
       class="field"
+      type="password"
     />
     <custom-button
       message="sign in"
@@ -47,7 +48,7 @@ import WaveFooter from "../components/WaveFooter.vue";
 import axios from "axios";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
-import { useStore } from "../store/useCryptoStore.ts";
+import { useStore } from "../store/useCryptouStore.ts";
 import router from "@/router";
 
 const { mobile } = useDisplay();
@@ -119,6 +120,7 @@ hr {
 .field {
   margin: 10px 0;
   display: flex;
+  padding:8px;
 }
 
 .register-link {

@@ -1,7 +1,10 @@
 import express, { Request, Response } from "express";
+import autorizeAdmin from "../middlewares/authorizeAdmin";
 import prisma from "../lib/prisma";
 const router = express.Router();
 import FeedValidatorService from "../rss/feedValidatorService";
+import feedFetcher from "../rss/feedFetcher";
+import FeedFetcher from "../rss/feedFetcher";
 
 
 /**
@@ -75,7 +78,7 @@ import FeedValidatorService from "../rss/feedValidatorService";
  *                 error:
  *                   type: string
  */
-router.post('/feeds', async (req: Request, res: Response) => {
+router.post('/feeds', autorizeAdmin, async (req: Request, res: Response) => {
     const { name, url, language } = req.body;
     const languageName = language.toLowerCase();
 
@@ -89,6 +92,7 @@ router.post('/feeds', async (req: Request, res: Response) => {
             },
         });
 
+
         if (existingFeed) {
             return res.status(409).json({ error: 'A feed with the same name or URL already exists' });
         }
@@ -100,6 +104,8 @@ router.post('/feeds', async (req: Request, res: Response) => {
         const newFeed = await prisma.feed.create({
             data: { name, url, languageName },
         });
+        const feedFetcher = new FeedFetcher();
+        await feedFetcher.fetchAllFeeds();
         res.status(201).json(newFeed);
     } catch (error: unknown) {
         if (error instanceof Error) {

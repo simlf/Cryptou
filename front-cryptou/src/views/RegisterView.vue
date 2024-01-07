@@ -22,6 +22,7 @@
         colorBackground="var(--primary-light-green)"
         v-model="password"
         class="field"
+        type="password"
       />
       <custom-selector-one
         placeholder="Select you curency"
@@ -56,7 +57,7 @@ import { ref, onMounted } from "vue";
 import { useDisplay } from "vuetify";
 import axios from "axios";
 import router from "@/router";
-import {useStore} from "@/store/useCryptoStore.ts";
+import {useStore} from "@/store/useCryptouStore.js";
 const { mobile } = useDisplay();
 
 const cryptouStore = useStore();

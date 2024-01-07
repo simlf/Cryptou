@@ -28,7 +28,7 @@ import CryptoGraph from "@components/CryptoGraph.vue";
 import CustomSelectorOne from "@components/CustomSelectorOne.vue";
 
 import { CryptoData } from "@/types/cryptoInterface.ts";
-import {useStore} from "../store/useCryptoStore.ts";
+import {useStore} from "../store/useCryptouStore.ts";
 
 let currentId = ref('');
 let currentCrypto = ref('');

@@ -2,14 +2,17 @@
 import { ref } from "vue";
 import SettingGeneralTab from "../components/SettingGeneralTab.vue";
 import SettingFavoriteTab from "../components/SettingFavoriteTab.vue";
-import SettingPublicationTab from "../components/SettingPublicationTab.vue";
 import SettingSettingTab from "../components/SettingSettingTab.vue";
+
+import { useStore } from "@/store/useCryptouStore.js";
+const storage = useStore();
 
 const tabs = ref([
   { name: "General", content: "Contenu de General" },
   { name: "Favorite", content: "Contenu de Favorite cryptos" },
-  { name: "Publication", content: "Contenu de Publication" },
-  { name: "Setting", content: "Contenu de Setting" },
+  ...(storage.user.role === 1
+    ? [{ name: "Setting", content: "Contenu de Setting" }]
+    : []),
 ]);
 
 const selectedTab = ref(tabs.value[0]);
@@ -35,13 +38,11 @@ function selectTab(tab) {
       <div v-if="selectedTab.name === 'General'"><SettingGeneralTab /></div>
       <!-- Onglet Favorite -->
       <div v-if="selectedTab.name === 'Favorite'"><SettingFavoriteTab /></div>
-      <div v-if="selectedTab.name === 'Publication'">
-        <!-- Onglet Publication -->
-        <SettingPublicationTab />
-      </div>
-      <div v-if="selectedTab.name === 'Setting'">
-        <!-- Onglet Setting -->
-        <SettingSettingTab />
+      <!-- Onglet Setting -->
+      <div v-if="storage.user.role === 1">
+        <div v-if="selectedTab.name === 'Setting'">
+          <SettingSettingTab />
+        </div>
       </div>
     </div>
   </div>

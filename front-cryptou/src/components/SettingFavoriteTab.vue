@@ -1,34 +1,82 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
+import { useStore } from "@/store/useCryptouStore.js";
+import customSelectorMulti from "@/components/CustomSelectorMulti.vue";
+import axios from "axios";
 
-// à revoir -> ce sera une liste de string
-const cryptos = ref([
-  { name: "BTC", select: true },
-  { name: "ETH", select: false },
-  { name: "BNB", select: false },
-  { name: "XRP", select: false },
-  { name: "DOGE", select: false },
-  { name: "SOL", select: true },
-  { name: "ADA", select: true },
-  { name: "TRX", select: false },
-  { name: "DOT", select: false },
-  { name: "LINK", select: false },
-  { name: "LTC", select: false },
-]);
+const storage = useStore();
+let userCryptos = ref([]);
+let cryptoNameList = ref([]);
+let keywords = ref(storage.user.keywordArray || []);
+let newKeyword = ref([]);
+let keywordList = ref([]);
 
-function addKeyword() {}
+console.log("userCryptos", storage.user.cryptoArray[0]);
+if (storage.user.cryptoArray[0]) userCryptos.value = storage.user.cryptoArray[0].split(";");
+cryptoNameList.value = storage.cryptoNameList;
 
-function toggleSelect(crypto) {
-  crypto.select = !crypto.select;
-  // sauvegarder
-  saveToDatabase();
+console.log("storage", storage);
+console.log("keywords", keywords);
+
+function addKeyword() {
+  if (newKeyword.value && !keywords.value.includes(newKeyword.value)) {
+    keywords.value.push(newKeyword.value);
+    newKeyword.value = "";
+    saveUserData();
+  }
 }
 
-function saveToDatabase() {
-  // créer un tableau de string avec les noms des cryptos
-  // chaque nouvelle selection va écraser le tableau
-  console.log("save");
+async function getKeywords() {
+  const response = await axios.get("http://localhost:3000/keywords");
+  keywordList.value = response.data.map((keyword) => keyword.keyword);
+  console.log("fetchedData", keywordList.value);
 }
+
+function updateUserCryptos(crypto: string) {
+  const index = userCryptos.value.indexOf(crypto);
+  if (index > -1) {
+    userCryptos.value.splice(index, 1);
+  } else if (!userCryptos.value.includes(crypto)) {
+    userCryptos.value.push(crypto);
+  }
+  saveUserCrypto();
+}
+
+async function saveUserData() {
+  console.log("new keyword", newKeyword.value);
+  axios.patch("http://localhost:3000/users/profile", {
+    userId: storage.user.id,
+    keywords: newKeyword.value.join(","),
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
+
+  storage.user.keywordArray = newKeyword.value;
+}
+
+async function saveUserCrypto() {
+  console.log("new keyword", newKeyword.value);
+  axios.patch("http://localhost:3000/users/profile", {
+    userId: storage.user.id,
+    crypto: userCryptos.value.join(";"),
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
+
+  storage.user.keywordArray = newKeyword.value;
+}
+
+function isSelected(crypto) {
+  return userCryptos.value.includes(crypto);
+}
+
+onMounted(() => {
+  getKeywords();
+});
 </script>
 <template>
   <div class="profile-section">
@@ -38,22 +86,29 @@ function saveToDatabase() {
       in a way to facilitate ergonomics for you.
     </p>
     <p>Select your crypto</p>
+
     <div>
       <span
         class="crypto"
-        v-for="crypto in cryptos"
-        :key="crypto.name"
-        :class="{ selected: crypto.select }"
-        @click="toggleSelect(crypto)"
+        v-for="crypto in cryptoNameList"
+        :key="crypto"
+        @click="updateUserCryptos(crypto)"
+        :class="{ selected: isSelected(crypto) }"
       >
-        {{ crypto.name }}
+        {{ crypto }}
       </span>
     </div>
-    <h2 class="mt-10">Favorite Feeds</h2>
+  </div>
+  <div class="profile-section">
+    <h2 class="mt-10">Favorite Keyword</h2>
     <p class="profile-description">
       Track your keywords across the web without having to read everything!
     </p>
-    <button @click="addKeyword">New Keyword</button>
+    <p>Your keywords</p>
+    <br />
+    <br />
+    <custom-selector-multi :array-choices="keywordList" color-background="var(--primary-light-green)" placeholder="select favorite keyword" @update:modelValue="newKeyword = $event"/>
+    <button @click="saveUserData">Save Keyword</button>
   </div>
 </template>
 
@@ -64,6 +119,11 @@ function saveToDatabase() {
 .profile-description {
   border-bottom: 2px solid #ccc;
   padding-bottom: 20px;
+}
+
+.keyword {
+  margin: 10px;
+  padding: 8px;
 }
 
 table {
@@ -100,6 +160,12 @@ button {
 }
 
 button:hover {
-  background-color: #48a9a6;
+  background-color: #68b7b4;
+}
+
+input {
+  padding: 0px 5px;
+  background-color: #f5f5f5;
+  margin-right: 20px;
 }
 </style>
