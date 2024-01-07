@@ -2,36 +2,23 @@
 import { ref } from "vue";
 import SettingGeneralTab from "../components/SettingGeneralTab.vue";
 import SettingFavoriteTab from "../components/SettingFavoriteTab.vue";
-import SettingPublicationTab from "../components/SettingPublicationTab.vue";
 import SettingSettingTab from "../components/SettingSettingTab.vue";
+
+import { useStore } from "@/store/useCryptouStore.js";
+const storage = useStore();
 
 const tabs = ref([
   { name: "General", content: "Contenu de General" },
   { name: "Favorite", content: "Contenu de Favorite cryptos" },
-  { name: "Publication", content: "Contenu de Publication" },
-  { name: "Setting", content: "Contenu de Setting" },
+  ...(storage.user.role === 1
+    ? [{ name: "Setting", content: "Contenu de Setting" }]
+    : []),
 ]);
 
 const selectedTab = ref(tabs.value[0]);
 function selectTab(tab) {
   selectedTab.value = tab;
 }
-
-// const fetchUserData = async () => {
-//   try {
-//     const token = localStorage.getItem("userToken");
-//     const response = await axios.get("http://localhost:3000/users/profile", {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     const userData = response.data;
-//     console.log(userData);
-//     return userData;
-//   } catch (error) {
-//     console.error("Error fetching user data:", error);
-//   }
-// };
 </script>
 
 <template>
@@ -51,12 +38,12 @@ function selectTab(tab) {
       <div v-if="selectedTab.name === 'General'"><SettingGeneralTab /></div>
       <!-- Onglet Favorite -->
       <div v-if="selectedTab.name === 'Favorite'"><SettingFavoriteTab /></div>
-      <!-- Onglet Publication -->
-      <div v-if="selectedTab.name === 'Publication'">
-        <SettingPublicationTab />
-      </div>
       <!-- Onglet Setting -->
-      <div v-if="selectedTab.name === 'Setting'"><SettingSettingTab /></div>
+      <div v-if="storage.user.role === 1">
+        <div v-if="selectedTab.name === 'Setting'">
+          <SettingSettingTab />
+        </div>
+      </div>
     </div>
   </div>
 </template>
