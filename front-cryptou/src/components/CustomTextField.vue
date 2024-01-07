@@ -4,6 +4,7 @@
     :placeholder="placeholder"
     :style="{ backgroundColor: colorBackground }"
     :value="modelValue"
+    :type="type"
     @input="updateValue"
   />
 </template>
@@ -20,7 +21,11 @@ defineProps({
   },
   modelValue: {
     type: String,
-    required: true,
+  },
+  type: {
+    type: String,
+    required: false,
+    default: "text",
   },
 });
 

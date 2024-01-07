@@ -21,6 +21,7 @@
       colorBackground="var(--primary-light-green)"
       v-model="password"
       class="field"
+      type="password"
     />
     <custom-button
       message="sign in"
@@ -119,6 +120,7 @@ hr {
 .field {
   margin: 10px 0;
   display: flex;
+  padding:8px;
 }
 
 .register-link {

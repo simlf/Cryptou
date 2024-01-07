@@ -3,6 +3,7 @@ import {ref, onMounted, reactive, watch} from 'vue';
 import axios from 'axios';
 import CustomSelectorMulti from "@components/CustomSelectorMulti.vue";
 import {useStore} from "@/store/useCryptouStore.js";
+import CustomButton from "@components/CustomButton.vue";
 
 const storage = useStore();
 
@@ -91,9 +92,7 @@ const fetchArticles = async () => {
 
     const response = await axios.get(url, {
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        'Authorization': storage.user?.token
+        'Authorization': 'Bearer ' + storage.user?.token
       }
     });
 
@@ -104,7 +103,6 @@ const fetchArticles = async () => {
     errorMessage.value = 'Failed to load articles. Please try again later.';
   }
 };
-
 
 watch([selectedKeywords, selectedFeeds, dateRange], () => {
   fetchArticles();
@@ -122,6 +120,8 @@ onMounted(async () => {
   );
   fetchArticles();
 });
+
+
 </script>
 
 <template>
