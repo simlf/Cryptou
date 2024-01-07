@@ -35,8 +35,10 @@ export const useStore = defineStore("cryptos", {
       currency: string,
       token: string
     ) {
-      const cryptoArray = crypto.split(",");
-      const keywordArray = keywords.split(",");
+      let cryptoArray: string[] = []
+      let keywordArray: string[] = []
+      if (crypto) cryptoArray = crypto.split(",");
+      if (keywords) keywordArray = keywords.split(",");
       const username = email.split("@")[0];
       this.user = {
         email,
@@ -58,7 +60,10 @@ export const useStore = defineStore("cryptos", {
       };
 
       try {
-        await axios.put("http://localhost:3000/users/profile", userData, {
+        await axios.patch("http://localhost:3000/users/profile",{
+          userId: userData,
+          userData,
+        }, {
           headers: {
             Authorization: `Bearer ${this.user.token}`,
           },

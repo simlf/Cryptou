@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import axios from "axios";
 import { useStore } from "@/store/useCryptouStore.js";
+import CustomTextField from "@components/CustomTextField.vue";
+import CustomButton from "@components/CustomButton.vue";
 
 const storage = useStore();
 let cryptoNameList = ref([]);
@@ -8,18 +11,43 @@ cryptoNameList = storage.cryptoNameList;
 console.log("cryptoNameList", cryptoNameList);
 let newCryptoNameList = ref("");
 
-function addCrypto() {
-  if (
-    newCryptoNameList.value &&
-    !cryptoNameList.value.includes(newCryptoNameList.value)
-  ) {
-    cryptoNameList.value.push(newCryptoNameList.value);
-    newCryptoNameList.value = "";
-    saveCryptoData();
-  }
+let newCryptoName = ref("");
+let newCryptoSlug = ref("");
+let newCryptoImage = ref("");
+
+let newFluxName = ref("");
+let newFluxUrl = ref("");
+let newFluxLanguage = ref("");
+
+
+async function saveCryptoData() {
+  console.log(storage.user.role)
+  await axios.post("http://localhost:3000/cryptos", {
+    userRole: storage.user.role,
+    fullName: newCryptoName.value,
+    slugName: newCryptoSlug.value,
+    imageUrl: newCryptoImage.value,
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
 }
 
-function saveCryptoData() {}
+async function saveFluxData() {
+  console.log(storage.user.role)
+  await axios.post("http://localhost:3000/feeds", {
+    userRole: storage.user.role,
+    name: newFluxName.value,
+    url: newFluxUrl.value,
+    language: newFluxLanguage.value,
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
+}
+
 </script>
 <template>
   <div class="profile-section">
@@ -38,12 +66,18 @@ function saveCryptoData() {}
     </span>
     <br />
     <br />
-    <input
-      type="text"
-      v-model="newCryptoNameList"
-      placeholder="Add a new crypto"
-    />
-    <button @click="addCrypto">New Crypto</button>
+    <div class="form-wrapper">
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Crypto name" @update:modelValue="newCryptoName = $event"/>
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Crypto Slug (ex: BTC)" @update:modelValue="newCryptoSlug = $event"/>
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Image url crypto" @update:modelValue="newCryptoImage = $event"/>
+      <custom-button color-background="var(--primary-dark-green)" message="add new crytpo" @click="saveCryptoData"/>
+    </div>
+    <div class="form-wrapper">
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux name" @update:modelValue="newFluxName = $event"/>
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux Url" @update:modelValue="newFluxUrl = $event"/>
+      <custom-text-field color-background="var(--primary-light-green)" placeholder="Flux language" @update:modelValue="newFluxLanguage = $event"/>
+      <custom-button color-background="var(--primary-dark-green)" message="add new crytpo" @click="saveFluxData"/>
+    </div>
   </div>
 </template>
 

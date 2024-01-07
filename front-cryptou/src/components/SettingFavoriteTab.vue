@@ -8,10 +8,11 @@ const storage = useStore();
 let userCryptos = ref([]);
 let cryptoNameList = ref([]);
 let keywords = ref(storage.user.keywordArray || []);
-let newKeyword = ref("");
+let newKeyword = ref([]);
 let keywordList = ref([]);
 
-userCryptos.value = storage.user.cryptoArray[0].toString().split(", ");
+console.log("userCryptos", storage.user.cryptoArray[0]);
+if (storage.user.cryptoArray[0]) userCryptos.value = storage.user.cryptoArray[0].split(";");
 cryptoNameList.value = storage.cryptoNameList;
 
 console.log("storage", storage);
@@ -38,20 +39,35 @@ function updateUserCryptos(crypto: string) {
   } else if (!userCryptos.value.includes(crypto)) {
     userCryptos.value.push(crypto);
   }
-  saveUserData();
+  saveUserCrypto();
 }
 
 async function saveUserData() {
+  console.log("new keyword", newKeyword.value);
   axios.patch("http://localhost:3000/users/profile", {
     userId: storage.user.id,
-    keywords: keywords.value.join(","),
+    keywords: newKeyword.value.join(","),
   }, {
     headers: {
       Authorization: `Bearer ${storage.user.token}`,
     },
   });
 
-  storage.user.keywordArray = keywords.value;
+  storage.user.keywordArray = newKeyword.value;
+}
+
+async function saveUserCrypto() {
+  console.log("new keyword", newKeyword.value);
+  axios.patch("http://localhost:3000/users/profile", {
+    userId: storage.user.id,
+    crypto: userCryptos.value.join(";"),
+  }, {
+    headers: {
+      Authorization: `Bearer ${storage.user.token}`,
+    },
+  });
+
+  storage.user.keywordArray = newKeyword.value;
 }
 
 function isSelected(crypto) {
@@ -91,7 +107,7 @@ onMounted(() => {
     <p>Your keywords</p>
     <br />
     <br />
-    <custom-selector-multi :array-choices="keywordList" color-background="var(--primary-light-green)" placeholder="select favorite keyword"/>
+    <custom-selector-multi :array-choices="keywordList" color-background="var(--primary-light-green)" placeholder="select favorite keyword" @update:modelValue="newKeyword = $event"/>
     <button @click="saveUserData">Save Keyword</button>
   </div>
 </template>

@@ -92,9 +92,7 @@ const fetchArticles = async () => {
 
     const response = await axios.get(url, {
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        'Authorization': storage.user?.token
+        'Authorization': 'Bearer ' + storage.user?.token
       }
     });
 
@@ -105,7 +103,6 @@ const fetchArticles = async () => {
     errorMessage.value = 'Failed to load articles. Please try again later.';
   }
 };
-
 
 watch([selectedKeywords, selectedFeeds, dateRange], () => {
   fetchArticles();
@@ -124,20 +121,6 @@ onMounted(async () => {
   fetchArticles();
 });
 
-async function saveKeyword() {
-  try {
-    await axios.put("http://localhost:3000/users/profile", {
-      keywords: selectedKeywords.value.join(","),
-    }, {
-      headers: {
-        Authorization: `Bearer ${storage.user.token}`,
-      },
-    });
-    alert("keyword updated successfully!")
-  } catch (error) {
-    console.error("Error updating email", error);
-  }
-}
 
 </script>
 
@@ -160,7 +143,6 @@ async function saveKeyword() {
             colorBackground="#48A9A6"
         />
       </v-col>
-      <CustomButton color-background="#48A9A6" message="Save keyword" @onClick="saveKeyword()"/>
       <v-col cols="6" md="4">
         <CustomSelectorMulti
             v-model="selectedFeeds"
